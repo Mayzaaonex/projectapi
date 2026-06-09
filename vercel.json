@@ -1,47 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    { 
-      "src": "**/*.php", 
-      "use": "vercel-php@0.7.1" 
-    }
-  ],
   "routes": [
-    { 
-      "src": "/public/(.*)", 
-      "dest": "/public/$1" 
-    },
-    { 
-      "src": "/api/(.*)", 
-      "dest": "/api/$1.php" 
-    },
-    { 
-      "src": "/maker/brat", 
-      "dest": "/maker/brat.php" 
-    },
-    { 
-      "src": "/maker", 
-      "dest": "/maker/index.php" 
-    },
-    { 
-      "src": "/maker/(.*)", 
-      "dest": "/maker/$1.php" 
-    },
-    { 
-      "src": "/downloader", 
-      "dest": "/downloader/index.php" 
-    },
-    { 
-      "src": "/downloader/(.*)", 
-      "dest": "/downloader/$1.php" 
-    },
-    { 
-      "src": "/", 
-      "dest": "/index.php" 
-    },
-    { 
-      "src": "/(.*)", 
-      "dest": "/index.php" 
-    }
+    { "src": "/public/(.*)", "dest": "/public/$1" },
+    { "src": "/maker/brat", "dest": "/maker/brat.html" },
+    { "src": "/maker", "dest": "/maker/index.html" },
+    { "src": "/downloader", "dest": "/downloader/index.html" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
