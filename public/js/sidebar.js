@@ -28,7 +28,7 @@ class Sidebar {
                     </a>
                 </nav>
 
-                <div class="text-[10px] text-slate-700 px-2">Copyright © RianModss</div>
+                <div class="text-[10px] text-slate-700 px-2"></div>
             </aside>
         `;
 
