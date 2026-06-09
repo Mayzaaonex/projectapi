@@ -5,34 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maker API - Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/dashboard.css">
-    <style>
-        .api-menu-card {
-            background: linear-gradient(135deg, rgba(15,15,15,0.9), rgba(10,10,10,0.95));
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 28px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-            backdrop-filter: blur(10px);
-        }
-        .api-menu-card:hover {
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-6px);
-        }
-    </style>
+    <link rel="stylesheet" href="/public/css/style.css">
 </head>
 <body>
     <div class="flex h-screen overflow-hidden">
+        
         <div id="sidebar-container"></div>
 
         <main class="flex-1 overflow-y-auto p-8 ml-56">
             <div class="max-w-4xl mx-auto">
-
+                
                 <div class="mb-8">
                     <h1 class="text-2xl font-bold text-white">⚙️ Maker API</h1>
                     <p class="text-sm text-slate-400 mt-1">Pilih endpoint maker yang tersedia.</p>
@@ -72,7 +54,7 @@
         </main>
     </div>
 
-    <script src="/sidebar.js"></script>
+    <script src="/public/js/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => Sidebar.render('maker'));
     </script>

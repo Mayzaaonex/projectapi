@@ -1,11 +1,10 @@
 const MAX_HISTORY = 24;
-const API_STATS_URL = '/api/stats';
 let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
 let prevTotal = 0;
 
-// ========== CURSOR-FOLLOWING PARTICLE SYSTEM ==========
+// ========== LIGHTWEIGHT CURSOR-FOLLOWING PARTICLE SYSTEM ==========
 class CursorParticleSystem {
     constructor() {
         this.canvas = document.getElementById('particle-canvas');
@@ -14,23 +13,31 @@ class CursorParticleSystem {
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
         this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        this.isActive = true;
         this.frameCount = 0;
+
         this.init();
     }
 
     init() {
         this.resize();
         window.addEventListener('resize', () => this.resize());
+
+        // Track mouse position
         window.addEventListener('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
         });
+
+        // Touch support
         window.addEventListener('touchmove', (e) => {
             if (e.touches[0]) {
                 this.mouse.x = e.touches[0].clientX;
                 this.mouse.y = e.touches[0].clientY;
             }
         });
+
+        // Create fewer particles for performance
         this.createParticles(25);
         this.animate();
     }
@@ -56,17 +63,24 @@ class CursorParticleSystem {
 
     update() {
         for (let p of this.particles) {
+            // Calculate distance to mouse
             const dx = this.mouse.x - p.x;
             const dy = this.mouse.y - p.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
+            // Follow cursor with easing
             p.vx += dx * p.speed * 0.05;
             p.vy += dy * p.speed * 0.05;
+
+            // Apply friction
             p.vx *= 0.95;
             p.vy *= 0.95;
+
+            // Update position
             p.x += p.vx;
             p.y += p.vy;
 
+            // Wrap around edges
             if (p.x < 0) p.x = this.canvas.width;
             if (p.x > this.canvas.width) p.x = 0;
             if (p.y < 0) p.y = this.canvas.height;
@@ -77,6 +91,7 @@ class CursorParticleSystem {
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // Draw connections (only every 3rd frame for performance)
         if (this.frameCount % 3 === 0) {
             const maxDist = 100;
             for (let i = 0; i < this.particles.length; i++) {
@@ -84,6 +99,7 @@ class CursorParticleSystem {
                     const dx = this.particles[i].x - this.particles[j].x;
                     const dy = this.particles[i].y - this.particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
+
                     if (dist < maxDist) {
                         const opacity = (1 - dist / maxDist) * 0.06;
                         this.ctx.beginPath();
@@ -97,6 +113,7 @@ class CursorParticleSystem {
             }
         }
 
+        // Draw particles
         for (let p of this.particles) {
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -104,6 +121,7 @@ class CursorParticleSystem {
             this.ctx.fill();
         }
 
+        // Draw mouse glow
         const gradient = this.ctx.createRadialGradient(
             this.mouse.x, this.mouse.y, 0,
             this.mouse.x, this.mouse.y, 80
@@ -117,6 +135,7 @@ class CursorParticleSystem {
     }
 
     animate() {
+        if (!this.isActive) return;
         this.frameCount++;
         this.update();
         this.draw();
@@ -127,13 +146,21 @@ class CursorParticleSystem {
 // ========== WELCOME SCREEN ==========
 function initWelcomeScreen() {
     const welcome = document.getElementById('welcome-screen');
-    if (!welcome) return;
-
-    if (sessionStorage.getItem('welcomeShown')) {
-        welcome.style.display = 'none';
+    if (!welcome) {
+        console.log('Welcome screen element not found');
         return;
     }
 
+    // Check if already shown in this session
+    if (sessionStorage.getItem('welcomeShown')) {
+        welcome.style.display = 'none';
+        console.log('Welcome already shown, hiding');
+        return;
+    }
+
+    console.log('Showing welcome screen...');
+
+    // Force display block first
     welcome.style.display = 'flex';
 
     setTimeout(() => {
@@ -141,6 +168,7 @@ function initWelcomeScreen() {
         setTimeout(() => {
             welcome.style.display = 'none';
             sessionStorage.setItem('welcomeShown', 'true');
+            console.log('Welcome screen hidden');
         }, 1200);
     }, 2500);
 }
@@ -189,120 +217,52 @@ function initChart() {
     });
 }
 
-// ========== FETCH API STATS ==========
-async function fetchStats() {
-    try {
-        const res = await fetch(API_STATS_URL);
-        if (!res.ok) return;
+function updateStats() {
+    if (!trafficChart) return;
 
-        const data = await res.json();
-        const now = new Date();
-        const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+    const stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
+    const now = new Date();
+    const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
 
-        const newRequests = Math.max(0, (data.total || 0) - prevTotal);
-        prevTotal = data.total || 0;
+    const newRequests = Math.max(0, stats.total - prevTotal);
+    prevTotal = stats.total;
 
-        if (trafficChart) {
-            trafficData.push(newRequests);
-            trafficData.shift();
-            trafficLabels.push(timeStr);
-            trafficLabels.shift();
-            trafficChart.data.datasets[0].data = [...trafficData];
-            trafficChart.data.labels = [...trafficLabels];
-            trafficChart.update('active');
-        }
+    trafficData.push(newRequests);
+    trafficData.shift();
+    trafficLabels.push(timeStr);
+    trafficLabels.shift();
 
-        // Update stats
-        const totalEl = document.getElementById('total-requests');
-        const creditsEl = document.getElementById('credits-used');
-        const creditBar = document.getElementById('credit-bar');
-        const creditLabel = document.getElementById('credit-label');
-        const trendReq = document.getElementById('trend-requests');
-        const trendCred = document.getElementById('trend-credits');
-        const activeUsers = document.getElementById('active-users');
-        const trendUsers = document.getElementById('trend-users');
+    trafficChart.data.datasets[0].data = [...trafficData];
+    trafficChart.data.labels = [...trafficLabels];
+    trafficChart.update('active');
 
-        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString();
-        if (creditsEl) creditsEl.textContent = (data.credits || 0).toLocaleString();
-        if (creditBar) creditBar.style.width = Math.min(100, (data.credits || 0) / 125) + '%';
-        if (creditLabel) creditLabel.textContent = `${(data.credits || 0).toLocaleString()} / 12,500`;
-        if (trendReq) {
-            const trendVal = newRequests > 0 ? `↑ ${newRequests}` : '↑ 0';
-            trendReq.textContent = trendVal;
-            trendReq.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
-        }
-        if (trendCred) {
-            const credTrend = newRequests > 0 ? `↑ ${newRequests}` : '↑ 0';
-            trendCred.textContent = credTrend;
-            trendCred.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
-        }
-        if (activeUsers) activeUsers.textContent = Math.floor((data.total || 0) * 0.7).toLocaleString();
-        if (trendUsers) {
-            trendUsers.textContent = newRequests > 0 ? '↑ Active' : '—';
-            trendUsers.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
-        }
+    const totalEl = document.getElementById('total-requests');
+    const creditsEl = document.getElementById('credits-used');
+    const creditBar = document.getElementById('credit-bar');
 
-        // Update activity list
-        updateActivityList(data.history || []);
-
-        // Update endpoint counts
-        const epTrack = document.getElementById('ep-track');
-        const epStats = document.getElementById('ep-stats');
-        const epBrat = document.getElementById('ep-brat');
-        if (epTrack) epTrack.textContent = (data.total || 0).toLocaleString();
-        if (epStats) epStats.textContent = Math.floor((data.total || 0) * 0.8).toLocaleString();
-        if (epBrat) epBrat.textContent = Math.floor((data.total || 0) * 0.6).toLocaleString();
-
-    } catch (e) {
-        console.log('Waiting for API data...');
-    }
+    if (totalEl) totalEl.textContent = stats.total.toLocaleString();
+    if (creditsEl) creditsEl.textContent = stats.credits.toLocaleString();
+    if (creditBar) creditBar.style.width = Math.min(100, stats.credits / 100) + '%';
 }
 
-// ========== ACTIVITY LIST ==========
-function updateActivityList(history) {
-    const list = document.getElementById('activity-list');
-    if (!list) return;
-
-    const recent = history.slice(-5).reverse();
-    
-    if (recent.length === 0) {
-        list.innerHTML = `
-            <div class="activity-item">
-                <div class="activity-dot"></div>
-                <div class="activity-info">
-                    <span class="activity-text">Waiting for data...</span>
-                    <span class="activity-time">--</span>
-                </div>
-            </div>`;
-        return;
-    }
-
-    list.innerHTML = recent.map(h => {
-        const time = new Date(h.time);
-        const seconds = Math.floor((Date.now() - time) / 1000);
-        const timeAgo = seconds < 60 ? `${seconds}s ago` : 
-                        seconds < 3600 ? `${Math.floor(seconds / 60)}m ago` : 
-                        `${Math.floor(seconds / 3600)}h ago`;
-
-        return `
-            <div class="activity-item">
-                <div class="activity-dot"></div>
-                <div class="activity-info">
-                    <span class="activity-text">${h.type || 'API Request'}</span>
-                    <span class="activity-time">${timeAgo}</span>
-                </div>
-                <span class="activity-status success">200</span>
-            </div>`;
-    }).join('');
-}
-
-// ========== INIT ==========
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing...');
+
     if (typeof Sidebar !== 'undefined') Sidebar.render('dashboard');
 
+    if (!localStorage.getItem('api_stats')) {
+        localStorage.setItem('api_stats', JSON.stringify({ total: 0, credits: 0, history: [] }));
+    }
+
+    // Initialize particle system
     new CursorParticleSystem();
+
+    // Initialize welcome screen - IMPORTANT: must be after particles
     initWelcomeScreen();
+
     initChart();
-    fetchStats();
-    setInterval(fetchStats, 2000);
+    setInterval(updateStats, 2000);
+    updateStats();
+
+    console.log('Initialization complete');
 });
