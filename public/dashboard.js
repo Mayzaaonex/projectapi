@@ -1,5 +1,5 @@
 // ==================== CONFIG ====================
-const API_STATS_URL = '/api-dashboard/api/stats.php';
+const API_STATS_URL = '/api/stats';
 const REFRESH_INTERVAL = 1000;
 const MAX_HISTORY = 24;
 

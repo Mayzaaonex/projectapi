@@ -2,7 +2,8 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-$statsFile = __DIR__ . '/../data/stats.json';
+// Vercel: pake /tmp/
+$statsFile = '/tmp/stats.json';
 
 if (!file_exists($statsFile)) {
     file_put_contents($statsFile, json_encode([

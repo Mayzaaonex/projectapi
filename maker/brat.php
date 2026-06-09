@@ -1,6 +1,6 @@
 <?php
-// Track request
-$statsFile = __DIR__ . '/../data/stats.json';
+// Vercel: pake /tmp/ buat writable storage
+$statsFile = '/tmp/stats.json';
 if (!file_exists($statsFile)) {
     file_put_contents($statsFile, json_encode([
         'total_requests' => 0,
@@ -9,26 +9,23 @@ if (!file_exists($statsFile)) {
     ]));
 }
 $stats = json_decode(file_get_contents($statsFile), true);
-$stats['total_requests']++;
-$stats['credits_used']++;
+$stats['total_requests'] = ($stats['total_requests'] ?? 0) + 1;
+$stats['credits_used'] = ($stats['credits_used'] ?? 0) + 1;
 $stats['history'][] = ['time' => date('H:i:s'), 'count' => 1];
 file_put_contents($statsFile, json_encode($stats));
 
 $generatedImage = null;
 $apiUrl = '';
-$errorMsg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
     $text = $_POST['text'];
     $bgColor = $_POST['bgColor'] ?? '8ACE00';
     $textColor = $_POST['textColor'] ?? '000000';
     
-    // Generate gambar pake GD Library
     $width = 1080;
     $height = 1080;
     $img = imagecreatetruecolor($width, $height);
     
-    // Parse hex colors
     $bgR = hexdec(substr($bgColor, 0, 2));
     $bgG = hexdec(substr($bgColor, 2, 2));
     $bgB = hexdec(substr($bgColor, 4, 2));
@@ -42,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
     
     imagefill($img, 0, 0, $bg);
     
-    // Text
     $fontSize = 80;
     $fontFile = __DIR__ . '/../public/fonts/arial.ttf';
     $textUpper = strtoupper($text);
@@ -53,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
         $y = ($height - ($bbox[1] - $bbox[7])) / 2;
         imagettftext($img, $fontSize, 0, $x, $y, $txtColor, $fontFile, $textUpper);
     } else {
-        // Fallback pake built-in font
         $fontSize = 5;
         $fw = imagefontwidth($fontSize);
         $fh = imagefontheight($fontSize);
@@ -63,14 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
         imagestring($img, $fontSize, $x, $y, $textUpper, $txtColor);
     }
     
-    // Output as base64
     ob_start();
     imagepng($img);
     $imageData = ob_get_clean();
     $generatedImage = 'data:image/png;base64,' . base64_encode($imageData);
     imagedestroy($img);
     
-    // API URL untuk Vercel
     $apiUrl = "https://{$_SERVER['HTTP_HOST']}/maker/brat?text=" . urlencode($text) . "&bgColor=" . urlencode($bgColor) . "&textColor=" . urlencode($textColor);
 }
 ?>
@@ -92,13 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
         <main class="flex-1 overflow-y-auto p-8">
             <div class="max-w-4xl mx-auto">
                 
-                <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-2xl font-bold text-white">🟢 Brat Generator</h1>
                     <p class="text-sm text-slate-400 mt-1">Buat teks gaya Brat dengan custom warna background & text.</p>
                 </div>
 
-                <!-- Input Form -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
                     <form method="POST">
                         <div class="mb-4">
@@ -111,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
 
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Background Color</label>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Background</label>
                                 <div class="flex gap-2">
-                                    <input type="color" name="bgColorPicker" 
+                                    <input type="color" 
                                         class="w-12 h-12 rounded-lg cursor-pointer border-0 bg-transparent"
                                         value="#<?php echo isset($_POST['bgColor']) ? htmlspecialchars($_POST['bgColor']) : '8ACE00'; ?>"
                                         onchange="document.getElementById('bgColorInput').value = this.value.replace('#', '')">
@@ -126,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Text Color</label>
                                 <div class="flex gap-2">
-                                    <input type="color" name="textColorPicker" 
+                                    <input type="color" 
                                         class="w-12 h-12 rounded-lg cursor-pointer border-0 bg-transparent"
                                         value="#<?php echo isset($_POST['textColor']) ? htmlspecialchars($_POST['textColor']) : '000000'; ?>"
                                         onchange="document.getElementById('textColorInput').value = this.value.replace('#', '')">
@@ -145,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
                     </form>
                 </div>
 
-                <!-- Result -->
                 <?php if ($generatedImage): ?>
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-4">
@@ -160,7 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
                         <img src="<?php echo $generatedImage; ?>" alt="Generated Brat" class="rounded-xl shadow-2xl" style="max-width: 400px; width: 100%;">
                     </div>
                     
-                    <!-- API URL -->
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
                         <p class="text-xs text-slate-400 mb-2 font-bold uppercase tracking-wider">🔗 API Endpoint</p>
                         <code class="text-sm text-green-400 mono break-all"><?php echo $apiUrl; ?></code>
