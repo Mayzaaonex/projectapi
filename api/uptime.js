@@ -4,9 +4,17 @@ const path = require('path');
 module.exports = async (req, res) => {
     const dbPath = path.join('/tmp', 'uptime.json');
 
-    // POST — Set/reset uptime
+    // Baca data
+    let data = { seconds: 0 };
+    try {
+        if (fs.existsSync(dbPath)) {
+            data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        }
+    } catch (e) {}
+
+    // POST — tambah 10 detik
     if (req.method === 'POST') {
-        const data = { startTime: Date.now() };
+        data.seconds = (data.seconds || 0) + 10;
         try {
             fs.writeFileSync(dbPath, JSON.stringify(data));
         } catch (e) {
@@ -15,13 +23,6 @@ module.exports = async (req, res) => {
         return res.json(data);
     }
 
-    // GET — Baca uptime
-    let data = { startTime: Date.now() };
-    try {
-        if (fs.existsSync(dbPath)) {
-            data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-        }
-    } catch (e) {}
-    
+    // GET — balikin total detik
     return res.json(data);
 };

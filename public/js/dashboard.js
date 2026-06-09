@@ -4,8 +4,7 @@ let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
 let prevTotal = 0;
-let uptimeStart = Date.now();
-let uptimeLoaded = false;
+let totalUptimeSeconds = 0;
 
 // ========== PARTICLE SYSTEM ==========
 class CursorParticleSystem {
@@ -115,27 +114,24 @@ class CursorParticleSystem {
     }
 }
 
-// ========== UPTIME ==========
+// ========== UPTIME (COUNTER) ==========
 async function fetchUptime() {
     try {
         const res = await fetch('/api/uptime');
         if (!res.ok) return;
         const data = await res.json();
-        if (data.startTime) {
-            uptimeStart = data.startTime;
-            uptimeLoaded = true;
-            localStorage.setItem('uptime_fallback', data.startTime);
-        }
+        totalUptimeSeconds = data.seconds || 0;
     } catch (e) {}
 }
 
 function updateUptime() {
     const uptimeEl = document.getElementById('uptime-display');
     if (!uptimeEl) return;
-    const diff = Math.floor((Date.now() - uptimeStart) / 1000);
-    const hours = Math.floor(diff / 3600);
-    const minutes = Math.floor((diff % 3600) / 60);
-    const seconds = diff % 60;
+    
+    const hours = Math.floor(totalUptimeSeconds / 3600);
+    const minutes = Math.floor((totalUptimeSeconds % 3600) / 60);
+    const seconds = totalUptimeSeconds % 60;
+    
     uptimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
@@ -244,19 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
     setInterval(fetchStats, 3000);
 
-    // UPTIME - Fetch dulu, kalo gagal pake fallback
+    // Uptime
     fetchUptime().then(() => {
-        if (!uptimeLoaded) {
-            const fallback = localStorage.getItem('uptime_fallback');
-            if (fallback) uptimeStart = parseInt(fallback);
-            else {
-                uptimeStart = Date.now();
-                localStorage.setItem('uptime_fallback', uptimeStart);
-            }
-        }
         updateUptime();
         setInterval(updateUptime, 1000);
     });
-
     setInterval(fetchUptime, 10000);
 });
