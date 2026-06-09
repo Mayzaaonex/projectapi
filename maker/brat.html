@@ -319,14 +319,6 @@
                 allowTaint: true,
                 foreignObjectRendering: true
             });
-
-            const blurredCanvas = document.createElement('canvas');
-            blurredCanvas.width = canvas.width;
-            blurredCanvas.height = canvas.height;
-
-            const ctx = blurredCanvas.getContext('2d');
-            ctx.filter = 'blur(3px)';
-            ctx.drawImage(canvas, 0, 0);
             
             blurredCanvas.toBlob(blob => {
                 const url = URL.createObjectURL(blob);
