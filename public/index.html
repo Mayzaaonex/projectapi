@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>API Dashboard</title>
+</head>
+<body class="bg-gray-900 text-white flex justify-center items-center h-screen">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl text-center">
+        <h1 class="text-2xl font-bold mb-4">Status Server</h1>
+        <div id="status" class="text-xl font-mono text-green-400">Memuat...</div>
+    </div>
+    <script>
+        fetch('/api/status')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status').innerText = data.status.toUpperCase();
+            });
+    </script>
+</body>
+</html>
