@@ -319,8 +319,8 @@
                 allowTaint: true,
                 foreignObjectRendering: true
             });
-            
-            blurredCanvas.toBlob(blob => {
+
+            canvas.toBlob(blob => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -330,7 +330,7 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast('✅ Download selesai!');
-            }, 'image/png');
+                }, 'image/png');
             
             trackUsage();
         } catch (e) {
