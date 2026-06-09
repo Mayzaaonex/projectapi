@@ -3,33 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Api-Mayzaa | Dashboard</title>
+    <title>Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        body { background: #080808; }
+        
+        /* Background yang lebih "hidup" dengan subtle gradient */
+        body { 
+            background-color: #050505; 
+            background-image: radial-gradient(circle at 80% -20%, rgba(79, 70, 229, 0.1), transparent 50%),
+                              radial-gradient(circle at 20% 120%, rgba(168, 85, 247, 0.08), transparent 50%);
+        }
 
-        .sidebar { background: #0d0d0d; border-right: 1px solid rgba(255,255,255,0.06); }
-        .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #555; transition: all 0.2s ease; cursor: pointer; text-decoration: none; }
-        .nav-link:hover { color: #ccc; background: rgba(255,255,255,0.04); }
-        .nav-link.active { color: #fff; background: rgba(255,255,255,0.08); }
+        .sidebar { background: rgba(13, 13, 13, 0.7); backdrop-filter: blur(12px); border-right: 1px solid rgba(255,255,255,0.05); }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13.5px; font-weight: 500; color: #666; transition: all 0.2s ease; cursor: pointer; text-decoration: none; }
+        .nav-link:hover { color: #ccc; background: rgba(255,255,255,0.03); }
+        .nav-link.active { color: #fff; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
         
         .stat-card { 
-            background: #0d0d0d; 
-            border: 1px solid rgba(255,255,255,0.06); 
-            border-radius: 14px; 
+            background: rgba(13, 13, 13, 0.5); 
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; 
             padding: 24px; 
             transition: all 0.3s ease; 
         }
-        .stat-card:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 0 20px rgba(99, 102, 241, 0.05); }
+        .stat-card:hover { border-color: rgba(99, 102, 241, 0.2); background: rgba(18, 18, 18, 0.6); }
 
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e99; animation: pulse 2.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e44; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        .credit-bar-bg { background: rgba(255,255,255,0.06); border-radius: 99px; height: 5px; overflow: hidden; }
-        .credit-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #8b5cf6); transition: width 1s ease-in-out; }
+        .credit-bar-bg { background: rgba(255,255,255,0.05); border-radius: 99px; height: 6px; overflow: hidden; }
+        .credit-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #a855f7); transition: width 1s ease-in-out; }
     </style>
 </head>
 <body class="text-gray-300">
@@ -38,7 +45,7 @@
         <aside class="sidebar w-56 flex flex-col py-6 px-4 shrink-0">
             <div class="px-2 mb-8 flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                    <span class="text-indigo-400 font-bold text-[10px]">AM</span>
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <span class="text-sm font-semibold text-white tracking-tight">Api-Mayzaa</span>
             </div>
@@ -57,30 +64,32 @@
         </aside>
 
         <main class="flex-1 overflow-y-auto p-10">
-            <div class="mb-8">
-                <h1 class="text-xl font-bold text-white tracking-tight">Dashboard Overview</h1>
-                <p class="text-sm text-gray-600">Pantau aktivitas API secara real-time.</p>
-            </div>
+            <div id="page-dashboard">
+                <div class="mb-8">
+                    <h1 class="text-xl font-bold text-white tracking-tight">Dashboard Overview</h1>
+                    <p class="text-sm text-gray-600 mt-1">Status dan penggunaan API saat ini.</p>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
-                <div class="stat-card">
-                    <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Status Sistem</p>
-                    <div class="flex items-center gap-2">
-                        <div class="status-dot"></div>
-                        <span id="stat-status" class="text-base font-semibold text-white">Operational</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
+                    <div class="stat-card">
+                        <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Status Sistem</p>
+                        <div class="flex items-center gap-2">
+                            <div class="status-dot"></div>
+                            <span class="text-sm font-semibold text-white">Operational</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="stat-card">
-                    <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Uptime Server</p>
-                    <span id="stat-uptime" class="text-2xl font-bold text-white mono">99.98%</span>
-                </div>
+                    <div class="stat-card">
+                        <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Uptime</p>
+                        <span id="stat-uptime" class="text-2xl font-bold text-white mono">99.98%</span>
+                    </div>
 
-                <div class="stat-card">
-                    <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Kredit Digunakan</p>
-                    <span id="stat-kredit" class="text-2xl font-bold text-white mono">6.800</span>
-                    <div class="credit-bar-bg mt-4">
-                        <div id="credit-bar" class="credit-bar-fill" style="width: 68%;"></div>
+                    <div class="stat-card">
+                        <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Kredit Digunakan Bulan Ini</p>
+                        <span id="stat-kredit" class="text-2xl font-bold text-white mono">6.800</span>
+                        <div class="credit-bar-bg mt-4">
+                            <div id="credit-bar" class="credit-bar-fill" style="width: 68%;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,12 +98,14 @@
 
     <script>
         function setPage(page, el) {
+            event.preventDefault();
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             el.classList.add('active');
         }
 
         setInterval(() => {
-            document.getElementById('stat-uptime').innerText = (99.90 + Math.random() * 0.1).toFixed(2) + '%';
+            const up = (99.90 + Math.random() * 0.1).toFixed(2);
+            document.getElementById('stat-uptime').innerText = up + '%';
             const k = Math.floor(6500 + Math.random() * 500);
             document.getElementById('stat-kredit').innerText = k.toLocaleString();
             document.getElementById('credit-bar').style.width = (k / 100) + '%';
