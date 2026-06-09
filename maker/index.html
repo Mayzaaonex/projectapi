@@ -21,48 +21,33 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Brat Generator -->
                     <a href="/maker/brat" class="api-menu-card">
                         <span class="text-3xl mb-3 block">🟢</span>
                         <h3 class="text-white font-semibold text-sm mb-1">Brat Generator</h3>
-                        <p class="text-xs text-slate-500">Buat teks gaya Brat dengan custom background & text color.</p>
+                        <p class="text-xs text-slate-500">Buat teks gaya Brat dengan custom warna.</p>
                         <code class="text-[10px] bg-slate-950 text-slate-500 px-2 py-1 rounded mt-3 inline-block mono">/maker/brat</code>
                     </a>
 
-                    <!-- Text Pro -->
                     <a href="/maker/textpro" class="api-menu-card">
                         <span class="text-3xl mb-3 block">📝</span>
                         <h3 class="text-white font-semibold text-sm mb-1">Text Pro</h3>
-                        <p class="text-xs text-slate-500">Text styling premium dengan berbagai efek keren.</p>
+                        <p class="text-xs text-slate-500">Text styling premium dengan efek keren.</p>
                         <code class="text-[10px] bg-slate-950 text-slate-500 px-2 py-1 rounded mt-3 inline-block mono">/maker/textpro</code>
                     </a>
 
-                    <!-- Image Generator -->
                     <a href="/maker/image" class="api-menu-card">
                         <span class="text-3xl mb-3 block">🖼️</span>
                         <h3 class="text-white font-semibold text-sm mb-1">Image Generator</h3>
-                        <p class="text-xs text-slate-500">Generate gambar AI dengan prompt custom.</p>
+                        <p class="text-xs text-slate-500">Generate gambar AI dengan prompt.</p>
                         <code class="text-[10px] bg-slate-950 text-slate-500 px-2 py-1 rounded mt-3 inline-block mono">/maker/image</code>
                     </a>
 
-                    <!-- Sticker Maker -->
                     <a href="/maker/sticker" class="api-menu-card">
                         <span class="text-3xl mb-3 block">🌟</span>
                         <h3 class="text-white font-semibold text-sm mb-1">Sticker Maker</h3>
-                        <p class="text-xs text-slate-500">Buat stiker WhatsApp dari gambar atau teks.</p>
+                        <p class="text-xs text-slate-500">Buat stiker WhatsApp dari gambar.</p>
                         <code class="text-[10px] bg-slate-950 text-slate-500 px-2 py-1 rounded mt-3 inline-block mono">/maker/sticker</code>
                     </a>
-                </div>
-
-                <!-- Info -->
-                <div class="mt-10 bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <h3 class="text-white font-semibold text-sm mb-2">📌 Cara Penggunaan</h3>
-                    <div class="text-xs text-slate-400 space-y-2">
-                        <p>1. Pilih endpoint maker yang ingin digunakan.</p>
-                        <p>2. Masukkan parameter yang diperlukan.</p>
-                        <p>3. Klik <span class="text-indigo-400 font-bold">Execute</span> untuk generate.</p>
-                        <p>4. Copy API endpoint untuk digunakan di aplikasi kamu.</p>
-                    </div>
                 </div>
 
             </div>
@@ -71,9 +56,7 @@
 
     <script src="/public/js/sidebar.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            Sidebar.render('maker');
-        });
+        document.addEventListener('DOMContentLoaded', () => Sidebar.render('maker'));
     </script>
 </body>
 </html>

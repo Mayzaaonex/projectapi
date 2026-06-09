@@ -1,4 +1,65 @@
-/* ==================== MOBILE SIDEBAR ==================== */
+/* ==================== FONT ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ==================== BASE ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #0a0e17;
+    background-image: 
+        radial-gradient(ellipse at 80% -20%, rgba(99, 102, 241, 0.08), transparent 50%),
+        radial-gradient(ellipse at 20% 120%, rgba(168, 85, 247, 0.05), transparent 50%);
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+.mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+    background: rgba(12, 16, 25, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(99, 102, 241, 0.06);
+    box-shadow: 2px 0 40px rgba(0,0,0,0.3);
+    position: fixed;
+    height: 100vh;
+    z-index: 50;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #cbd5e1;
+    background: rgba(99, 102, 241, 0.08);
+    transform: translateX(3px);
+}
+
+.nav-link.active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.12));
+    box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
+/* ==================== HAMBURGER MOBILE ==================== */
 .hamburger-btn {
     display: none;
     position: fixed;
@@ -15,12 +76,6 @@
     font-size: 20px;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.hamburger-btn:hover {
-    background: #1e293b;
-    border-color: #6366f1;
 }
 
 .sidebar-overlay {
@@ -29,13 +84,10 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     z-index: 49;
-    opacity: 0;
-    transition: opacity 0.3s ease;
 }
 
 .sidebar-overlay.active {
     display: block;
-    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -55,7 +107,6 @@
 
     .sidebar-overlay.active {
         display: block;
-        opacity: 1;
     }
 
     main {
@@ -64,14 +115,210 @@
     }
 
     .stat-card {
-        padding: 20px 16px;
+        padding: 20px 16px !important;
     }
 
     .stat-value {
-        font-size: 24px;
-    }
-
-    .chart-wrapper {
-        height: 180px;
+        font-size: 24px !important;
     }
 }
+
+/* ==================== STAT CARDS ==================== */
+.stat-card {
+    background: linear-gradient(135deg, #111827, #0f1520);
+    border: 1px solid #1e293b;
+    border-radius: 20px;
+    padding: 28px 24px;
+    transition: all 0.35s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
+}
+
+.stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #94a3b8;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ==================== STATUS DOT ==================== */
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 12px #22c55e55;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* ==================== CREDIT BAR ==================== */
+.credit-bar-bg {
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.credit-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    transition: width 0.8s ease;
+}
+
+/* ==================== CHART ==================== */
+.chart-card {
+    background: linear-gradient(135deg, #111827, #0f1520);
+    border: 1px solid #1e293b;
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 220px;
+}
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ==================== API MENU CARDS ==================== */
+.api-menu-card {
+    background: linear-gradient(135deg, #111827, #0f1520);
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    padding: 28px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.api-menu-card:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
+}
+
+/* ==================== FORM INPUTS ==================== */
+input[type="text"] {
+    background: #0f1520;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #e2e8f0;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+input[type="color"] {
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn-execute {
+    width: 100%;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-execute:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-execute:active {
+    transform: scale(0.97);
+}
+
+/* ==================== RESULT ==================== */
+.result-image {
+    max-width: 400px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.code-block {
+    background: #0a0e17;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #4ade80;
+    word-break: break-all;
+}
+
+/* ==================== TOAST ==================== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #22c55e;
+    color: #000;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 13px;
+    z-index: 9999;
+    animation: fadeInUp 0.3s ease;
+    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
