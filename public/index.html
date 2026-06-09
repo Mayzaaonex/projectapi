@@ -1,21 +1,59 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>API Dashboard</title>
+    <title>API Manager</title>
 </head>
-<body class="bg-gray-900 text-white flex justify-center items-center h-screen">
-    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl text-center">
-        <h1 class="text-2xl font-bold mb-4">Status Server</h1>
-        <div id="status" class="text-xl font-mono text-green-400">Memuat...</div>
+<body class="bg-gray-900 text-white flex min-h-screen">
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 p-6">
+        <h2 class="text-xl font-bold mb-8 text-blue-400">API DASHBOARD</h2>
+        <nav class="space-y-4">
+            <a href="#" class="block py-2 px-4 bg-gray-700 rounded">Status Server</a>
+            <a href="#" class="block py-2 px-4 hover:bg-gray-700 rounded">API Logs</a>
+            <a href="#" class="block py-2 px-4 hover:bg-gray-700 rounded">Settings</a>
+        </nav>
     </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-10">
+        <h1 class="text-3xl font-bold mb-6">Overview</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <p class="text-gray-400">Server Status</p>
+                <h3 id="status" class="text-2xl font-bold mt-2 text-green-500">Memuat...</h3>
+            </div>
+            <!-- Card 2 -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <p class="text-gray-400">Total Request</p>
+                <h3 class="text-2xl font-bold mt-2">1,204</h3>
+            </div>
+            <!-- Card 3 -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <p class="text-gray-400">Latency</p>
+                <h3 class="text-2xl font-bold mt-2">45ms</h3>
+            </div>
+        </div>
+
+        <div class="mt-10 bg-gray-800 p-6 rounded-lg">
+            <h2 class="font-bold mb-4">Live Activity</h2>
+            <div id="logs" class="bg-black p-4 rounded font-mono text-sm h-40 overflow-y-auto text-green-400">
+                [SYSTEM] Initializing...
+            </div>
+        </div>
+    </div>
+
     <script>
-        fetch('/api/status')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('status').innerText = data.status.toUpperCase();
-            });
+        async function fetchStatus() {
+            const res = await fetch('/api/status');
+            const data = await res.json();
+            document.getElementById('status').innerText = data.status.toUpperCase();
+            document.getElementById('logs').innerHTML += `<br>> Status updated: ${data.timestamp}`;
+        }
+        fetchStatus();
     </script>
 </body>
 </html>
