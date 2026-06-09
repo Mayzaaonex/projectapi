@@ -1,148 +1,197 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brat Generator - Api-Mayzaa</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Brat API - Api-Mayzaa</title>
+    <style>
+        @font-face {
+            font-family: 'arial_narrowregular';
+            src: url('https://www.bratgenerator.com/sites/g/files/g2000017981/files/2024-03/arial_narrow-webfont.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'arial_narrowregular', 'Arial Narrow', Arial, sans-serif;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #memeContainer {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            background: #8ACE00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #textOverlay {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            color: #000;
+            font-family: 'arial_narrowregular', 'Arial Narrow', sans-serif;
+            font-size: 80px;
+            font-weight: 500;
+            filter: blur(1.5px);
+            word-break: break-word;
+            line-height: 0.9;
+        }
+
+        input[type="text"] {
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: 1px solid #d1d1d1;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            height: 50px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+        }
+        .btn-primary:hover { opacity: 0.8; }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #000;
+        }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        .api-url {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #64748b;
+            font-family: monospace;
+            word-break: break-all;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            #memeContainer {
+                width: 350px;
+                height: 350px;
+            }
+            #textOverlay {
+                font-size: 50px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="flex h-screen overflow-hidden">
-        
-        <div id="sidebar-container"></div>
 
-        <main class="flex-1 overflow-y-auto p-8 ml-56">
-            <div class="max-w-4xl mx-auto">
-                
-                <div class="mb-8">
-                    <h1 class="text-2xl font-bold text-white">🟢 Brat Generator</h1>
-                    <p class="text-sm text-slate-400 mt-1">Buat teks gaya Brat dengan custom warna.</p>
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
-                    <div class="mb-4">
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Text</label>
-                        <input type="text" id="textInput" required 
-                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition"
-                            placeholder="Masukkan teks...">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Background</label>
-                            <div class="flex gap-2">
-                                <input type="color" id="bgColorPicker" value="#8ACE00"
-                                    onchange="document.getElementById('bgColorInput').value = this.value.replace('#', '')">
-                                <input type="text" id="bgColorInput" value="8ACE00" placeholder="8ACE00"
-                                    class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mono">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Text Color</label>
-                            <div class="flex gap-2">
-                                <input type="color" id="textColorPicker" value="#000000"
-                                    onchange="document.getElementById('textColorInput').value = this.value.replace('#', '')">
-                                <input type="text" id="textColorInput" value="000000" placeholder="000000"
-                                    class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mono">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button onclick="generateBrat()" class="btn-execute">⚡ Execute</button>
-                </div>
-
-                <div id="resultContainer" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-white font-semibold">✅ Hasil Generate</h3>
-                        <button onclick="downloadImage()" class="text-xs bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition">📥 Download</button>
-                    </div>
-                    <div class="flex justify-center mb-6">
-                        <img id="resultImage" alt="Generated" class="result-image">
-                    </div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <p class="text-xs text-slate-400 mb-2 font-bold uppercase">🔗 API Endpoint</p>
-                        <code id="apiUrl" class="code-block block"></code>
-                        <button onclick="copyApiUrl()" class="mt-3 text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">📋 Copy URL</button>
-                    </div>
-                </div>
-
-            </div>
-        </main>
+    <div id="memeContainer">
+        <div id="textOverlay">brat</div>
     </div>
+
+    <input type="text" id="textInput" placeholder="Masukkan teks..." value="brat">
+
+    <div class="btn-group">
+        <button class="btn-primary" onclick="downloadImage()">📥 Download</button>
+        <button class="btn-secondary" onclick="copyApiUrl()">📋 Copy API URL</button>
+    </div>
+
+    <div class="api-url" id="apiUrlDisplay"></div>
 
     <script src="/public/js/sidebar.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => Sidebar.render('maker'));
+        const textInput = document.getElementById('textInput');
+        const textOverlay = document.getElementById('textOverlay');
+        let currentBlob = null;
 
-        let currentImageData = null;
-        let currentApiUrl = '';
+        // Update text realtime
+        textInput.addEventListener('input', () => {
+            textOverlay.textContent = textInput.value || 'brat';
+        });
 
-        function generateBrat() {
-            const text = document.getElementById('textInput').value;
-            if (!text) return showToast('❌ Masukkan teks dulu!', 'error');
-
-            const bgColor = document.getElementById('bgColorInput').value || '8ACE00';
-            const textColor = document.getElementById('textColorInput').value || '000000';
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1080;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#' + bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#' + textColor;
-            ctx.font = 'bold 80px "Inter", "Arial Black", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            const words = text.toUpperCase().split(' ');
-            const lines = [];
-            let currentLine = '';
-            for (let word of words) {
-                const testLine = currentLine + word + ' ';
-                if (ctx.measureText(testLine).width > canvas.width - 100) {
-                    lines.push(currentLine.trim());
-                    currentLine = word + ' ';
-                } else {
-                    currentLine = testLine;
-                }
-            }
-            lines.push(currentLine.trim());
-
-            const lineHeight = 90;
-            const startY = (canvas.height / 2) - ((lines.length - 1) * lineHeight / 2);
-            lines.forEach((line, i) => ctx.fillText(line, canvas.width / 2, startY + (i * lineHeight)));
-
-            currentImageData = canvas.toDataURL('image/png');
-            document.getElementById('resultImage').src = currentImageData;
-            currentApiUrl = `${window.location.origin}/maker/brat?text=${encodeURIComponent(text)}&bgColor=${bgColor}&textColor=${textColor}`;
-            document.getElementById('apiUrl').textContent = currentApiUrl;
-            document.getElementById('resultContainer').classList.remove('hidden');
+        // Generate & download
+        async function downloadImage() {
+            const text = textInput.value || 'brat';
+            
+            // Track usage
+            trackUsage('brat');
+            
+            // Convert HTML to canvas
+            const container = document.getElementById('memeContainer');
+            const canvas = await html2canvas(container, {
+                backgroundColor: '#8ACE00',
+                scale: 2
+            });
+            
+            // Download
+            canvas.toBlob(blob => {
+                currentBlob = blob;
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'brat.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
         }
 
-        function downloadImage() {
-            if (!currentImageData) return;
-            const a = document.createElement('a');
-            a.download = 'brat.png';
-            a.href = currentImageData;
-            a.click();
-        }
-
+        // Copy API URL
         function copyApiUrl() {
-            navigator.clipboard.writeText(currentApiUrl).then(() => showToast('✅ Link API dicopy!'));
+            const text = encodeURIComponent(textInput.value || 'brat');
+            const url = `${window.location.origin}/maker/brat?text=${text}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ API URL copied!');
+            });
+            document.getElementById('apiUrlDisplay').textContent = url;
         }
 
-        function showToast(msg, type = 'success') {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.textContent = msg;
-            if (type === 'error') t.style.background = '#ef4444';
-            document.body.appendChild(t);
-            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2000);
+        // Track ke localStorage
+        function trackUsage(type) {
+            let stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
+            stats.total++;
+            stats.credits++;
+            stats.history.push({ time: new Date().toISOString(), type: type });
+            if (stats.history.length > 50) stats.history = stats.history.slice(-50);
+            localStorage.setItem('api_stats', JSON.stringify(stats));
         }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Sidebar !== 'undefined') Sidebar.render('maker');
+            document.getElementById('apiUrlDisplay').textContent = 
+                `${window.location.origin}/maker/brat?text=${encodeURIComponent(textInput.value)}`;
+        });
     </script>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>

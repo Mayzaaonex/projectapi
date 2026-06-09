@@ -2,14 +2,7 @@ const MAX_HISTORY = 24;
 let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
-let totalRequests = 124521;
-let totalCredits = 8456;
-let baseTraffic = 18;
-
-// Inisialisasi data awal
-for (let i = 0; i < MAX_HISTORY; i++) {
-    trafficData[i] = Math.floor(Math.random() * 20) + 10;
-}
+let prevTotal = 0;
 
 function initChart() {
     const ctx = document.getElementById('trafficChart')?.getContext('2d');
@@ -37,53 +30,48 @@ function initChart() {
             animation: { duration: 500 },
             plugins: { legend: { display: false } },
             scales: {
-                x: { 
-                    grid: { color: '#1e293b' }, 
-                    ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 6 } 
-                },
-                y: { 
-                    grid: { color: '#1e293b' }, 
-                    ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 4 },
-                    min: 0, 
-                    max: 50 
-                }
+                x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 6 } },
+                y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 }, maxTicksLimit: 4 }, min: 0, max: 30 }
             }
         }
     });
 }
 
-function updateChart() {
+function updateStats() {
     if (!trafficChart) return;
-    
+
+    const stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
     const now = new Date();
     const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
-    
-    // Traffic natural: naik turun halus
-    baseTraffic += (Math.random() - 0.5) * 2;
-    baseTraffic = Math.max(10, Math.min(30, baseTraffic));
-    const newRequests = Math.floor(baseTraffic + (Math.random() - 0.5) * 10);
-    
-    trafficData.push(Math.max(3, newRequests));
+
+    // Hit new requests since last check
+    const newRequests = Math.max(0, stats.total - prevTotal);
+    prevTotal = stats.total;
+
+    trafficData.push(newRequests);
     trafficData.shift();
     trafficLabels.push(timeStr);
     trafficLabels.shift();
-    
+
     trafficChart.data.datasets[0].data = [...trafficData];
     trafficChart.data.labels = [...trafficLabels];
     trafficChart.update('active');
-    
-    // Update stats
-    totalRequests += newRequests;
-    totalCredits += Math.floor(newRequests * 0.8);
-    
-    document.getElementById('total-requests').textContent = totalRequests.toLocaleString();
-    document.getElementById('credits-used').textContent = totalCredits.toLocaleString();
-    document.getElementById('credit-bar').style.width = Math.min(100, totalCredits / 100) + '%';
+
+    // Update cards
+    document.getElementById('total-requests').textContent = stats.total.toLocaleString();
+    document.getElementById('credits-used').textContent = stats.credits.toLocaleString();
+    document.getElementById('credit-bar').style.width = Math.min(100, stats.credits / 100) + '%';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     Sidebar.render('dashboard');
+    
+    // Init stats localStorage kalo kosong
+    if (!localStorage.getItem('api_stats')) {
+        localStorage.setItem('api_stats', JSON.stringify({ total: 0, credits: 0, history: [] }));
+    }
+    
     initChart();
-    setInterval(updateChart, 1500);
-    updateChart();
+    setInterval(updateStats, 2000);
+    updateStats();
 });
