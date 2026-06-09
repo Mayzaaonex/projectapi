@@ -308,61 +308,77 @@
     }
 
     async function downloadImage() {
-        const text = textInput.value || 'brat';
-        
-        // Canvas tanpa blur
-        const sharp = document.createElement('canvas');
-        sharp.width = 1080;
-        sharp.height = 1080;
-        const sCtx = sharp.getContext('2d');
-        
-        sCtx.fillStyle = '#ffffff';
-        sCtx.fillRect(0, 0, 1080, 1080);
-        sCtx.fillStyle = '#000000';
-        sCtx.font = '500 90px "Arial Narrow", arial_narrowregular, Arial, sans-serif';
-        sCtx.textBaseline = 'middle';
-        
-        const words = text.split(' ');
-        const lines = [];
-        let currentLine = '';
-        for (let word of words) {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            if (sCtx.measureText(testLine).width > 900 && currentLine) {
-                lines.push(currentLine);
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
+    const text = textInput.value || 'brat';
+    
+    // Ambil data text dari span.textFitted (hasil textFit)
+    const fittedSpan = textOverlay.querySelector('span.textFitted');
+    const fontSize = fittedSpan ? parseFloat(fittedSpan.style.fontSize) : 70;
+    const displayText = fittedSpan ? fittedSpan.innerText : text;
+    
+    // Canvas sharp
+    const sharp = document.createElement('canvas');
+    sharp.width = 1080;
+    sharp.height = 1080;
+    const sCtx = sharp.getContext('2d');
+    
+    sCtx.fillStyle = '#ffffff';
+    sCtx.fillRect(0, 0, 1080, 1080);
+    sCtx.fillStyle = '#000000';
+    
+    // Scale font dari preview ke 1080p (320px → 1080px = 3.375x)
+    const scaleFactor = 1080 / 320;
+    const scaledFontSize = Math.round(fontSize * scaleFactor);
+    sCtx.font = `500 ${scaledFontSize}px "Arial Narrow", arial_narrowregular, Arial, sans-serif`;
+    sCtx.textBaseline = 'middle';
+    sCtx.textAlign = 'center';
+    
+    // Baca lebar span textFitted dari preview buat word wrap
+    const previewWidth = fittedSpan ? fittedSpan.offsetWidth : 400;
+    const scaledWidth = previewWidth * scaleFactor * 0.85;
+    
+    // Word wrap
+    const words = displayText.split(' ');
+    const lines = [];
+    let currentLine = '';
+    
+    for (let word of words) {
+        const testLine = currentLine + (currentLine ? ' ' : '') + word;
+        if (sCtx.measureText(testLine).width > scaledWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+        } else {
+            currentLine = testLine;
         }
-        if (currentLine) lines.push(currentLine);
-        
-        const lineHeight = 110;
-        const startY = (1080 / 2) - ((lines.length - 1) * lineHeight / 2);
-        lines.forEach((line, i) => sCtx.fillText(line, 90, startY + (i * lineHeight)));
-        
-        // Canvas dengan blur
-        const blurred = document.createElement('canvas');
-        blurred.width = 1080;
-        blurred.height = 1080;
-        const bCtx = blurred.getContext('2d');
-        bCtx.filter = 'blur(6px)';
-        bCtx.drawImage(sharp, 0, 0);
-        bCtx.filter = 'none';
-        
-        blurred.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'brat.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('✅ Download selesai!');
-        }, 'image/png');
-        
-        trackUsage();
     }
+    if (currentLine) lines.push(currentLine);
+    
+    const lineHeight = scaledFontSize * 1.1;
+    const startY = (1080 / 2) - ((lines.length - 1) * lineHeight / 2);
+    lines.forEach((line, i) => sCtx.fillText(line, 1080 / 2, startY + (i * lineHeight)));
+    
+    // Canvas blurred (blur kecil aja)
+    const blurred = document.createElement('canvas');
+    blurred.width = 1080;
+    blurred.height = 1080;
+    const bCtx = blurred.getContext('2d');
+    bCtx.filter = 'blur(4px)';
+    bCtx.drawImage(sharp, 0, 0);
+    bCtx.filter = 'none';
+    
+    blurred.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'brat.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('✅ Download selesai!');
+    }, 'image/png');
+    
+    trackUsage();
+}
 
     function copyApiUrl() {
         navigator.clipboard.writeText(currentApiUrl).then(() => showToast('✅ URL disalin!'));
