@@ -1,0 +1,23 @@
+{
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    },
+    "maker/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    },
+    "downloader/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    },
+    "*.php": {
+      "runtime": "vercel-php@0.6.0"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1.php" },
+    { "src": "/maker/(.*)", "dest": "/maker/$1.php" },
+    { "src": "/downloader/(.*)", "dest": "/downloader/$1.php" },
+    { "src": "/public/(.*)", "dest": "/public/$1" },
+    { "src": "/(.*)", "dest": "/index.php" }
+  ]
+}
