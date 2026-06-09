@@ -6,6 +6,7 @@
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/uptime", "dest": "/api/uptime.js" },
     { "src": "/public/(.*)", "dest": "/public/$1" },
     { "src": "/api/track", "dest": "/api/track.js" },
     { "src": "/api/stats", "dest": "/api/stats.js" },

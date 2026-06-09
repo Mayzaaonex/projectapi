@@ -4,14 +4,13 @@ let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
 let prevTotal = 0;
-let uptimeStart = new Date();
+let uptimeStart = Date.now();
 
 // ========== PARTICLE SYSTEM ==========
 class CursorParticleSystem {
     constructor() {
         this.canvas = document.getElementById('particle-canvas');
         if (!this.canvas) return;
-
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
         this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -115,17 +114,26 @@ class CursorParticleSystem {
     }
 }
 
-// ========== UPTIME TIMER ==========
+// ========== UPTIME ==========
+async function fetchUptime() {
+    try {
+        const res = await fetch('/api/uptime');
+        const data = await res.json();
+        if (data.startTime) {
+            uptimeStart = data.startTime;
+        } else {
+            await fetch('/api/uptime', { method: 'POST' });
+        }
+    } catch (e) {}
+}
+
 function updateUptime() {
     const uptimeEl = document.getElementById('uptime-display');
     if (!uptimeEl) return;
-    
-    const now = new Date();
-    const diff = Math.floor((now - uptimeStart) / 1000);
+    const diff = Math.floor((Date.now() - uptimeStart) / 1000);
     const hours = Math.floor(diff / 3600);
     const minutes = Math.floor((diff % 3600) / 60);
     const seconds = diff % 60;
-    
     uptimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
@@ -195,21 +203,16 @@ async function fetchStats() {
             trafficChart.update('active');
         }
 
-        // Update Total Requests
         const totalEl = document.getElementById('total-requests');
-        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString();
-
-        // Update Credits
         const creditsEl = document.getElementById('credits-used');
-        if (creditsEl) creditsEl.textContent = (data.credits || 0).toLocaleString();
-
-        // Update Credit Bar + Label
         const creditBar = document.getElementById('credit-bar');
-        const creditLabel = document.querySelector('.credit-section span.mono');
+        const creditLabel = document.getElementById('credit-label');
+
+        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString();
+        if (creditsEl) creditsEl.textContent = (data.credits || 0).toLocaleString();
         if (creditBar) creditBar.style.width = Math.min(100, (data.credits || 0) / 125) + '%';
         if (creditLabel) creditLabel.textContent = `${(data.credits || 0).toLocaleString()} / 12,500`;
 
-        // Update trend
         const trendReq = document.querySelector('.stat-item:nth-child(1) .stat-trend');
         if (trendReq) {
             trendReq.textContent = newRequests > 0 ? `↑ ${newRequests}` : '↑ 0';
@@ -233,10 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     new CursorParticleSystem();
     initChart();
-    fetchStats();
-    updateUptime();
 
-    // Refresh tiap 3 detik
+    fetchUptime().then(() => updateUptime());
+    fetchStats();
+
     setInterval(fetchStats, 3000);
     setInterval(updateUptime, 1000);
 });
