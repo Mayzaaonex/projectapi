@@ -24,7 +24,9 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 320px;
+            aspect-ratio: 1 / 1;
+            max-width: 500px;
+            margin: 0 auto;
             border-radius: 16px;
             overflow: hidden;
             background-color: #ffffff;
@@ -40,9 +42,8 @@
             font-family: arial_narrowregular, "Arial Narrow", sans-serif;
             text-align: left;
             width: calc(100% - 20px);
-            max-width: none;
             padding: 5px;
-            height: 240px;
+            height: 90%;
         }
 
         div#textOverlay span.textFitted {
@@ -200,16 +201,7 @@
             .sidebar { transform: translateX(-100%); z-index: 55; }
             .sidebar.open { transform: translateX(0); }
             main { margin-left: 0 !important; padding: 16px !important; padding-top: 70px !important; }
-
-            #memeContainer {
-                height: 320px;
-            }
-
-            #textOverlay {
-                width: calc(100% - 10px);
-                height: 280px;
-                padding: 5px;
-            }
+            #memeContainer { max-width: 100%; }
         }
     </style>
 </head>
@@ -223,46 +215,42 @@
              style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:40;"></div>
 
         <main class="flex-1 overflow-y-auto p-8" style="margin-left: 224px;">
-            <div style="max-width: 860px; margin: 0 auto;">
+            <div style="max-width: 600px; margin: 0 auto;">
 
-                <div class="mb-8">
+                <div class="mb-6">
                     <h1 style="font-size: 22px; font-weight: 700; color: #fff;">🟢 Brat Generator</h1>
                     <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Buat teks gaya Brat — download termasuk efek blur.</p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <div class="card" style="display: flex; flex-direction: column; gap: 20px;">
-                            <div>
-                                <label class="label">Text</label>
-                                <input type="text" id="textInput" class="input-field"
-                                    placeholder="Ketik teksmu..."
-                                    value="bikin brat disini">
-                            </div>
-                            <button class="btn-execute" onclick="downloadImage()">📥 Download PNG</button>
-                        </div>
-
-                        <div class="card">
-                            <p class="label">🔗 API Endpoint</p>
-                            <div class="api-url-block" id="apiUrl">—</div>
-                            <button class="btn-copy" onclick="copyApiUrl()">📋 Copy URL</button>
-                        </div>
+                <!-- LIVE PREVIEW DI ATAS -->
+                <div class="card mb-5" style="padding: 16px;">
+                    <p class="label" style="margin-bottom: 12px;">Live Preview</p>
+                    <div id="memeContainer">
+                        <div id="textOverlay"></div>
                     </div>
-
-                    <div>
-                        <div class="card" style="height: 100%; display: flex; flex-direction: column; gap: 16px;">
-                            <p class="label" style="margin: 0;">Live Preview</p>
-                            <div id="memeContainer">
-                                <div id="textOverlay"></div>
-                            </div>
-                            <p style="text-align: center; font-size: 12px; color: #475569; font-family: 'arial_narrowregular', Arial Narrow, sans-serif;">
-                                Download = persis seperti preview + blur
-                            </p>
-                        </div>
-                    </div>
-
+                    <p style="text-align: center; font-size: 11px; color: #475569; margin-top: 10px; font-family: 'arial_narrowregular', Arial Narrow, sans-serif;">
+                        Download = persis seperti preview + blur
+                    </p>
                 </div>
+
+                <!-- INPUT + BUTTON DI BAWAH -->
+                <div class="card mb-5">
+                    <div class="mb-4">
+                        <label class="label">Text</label>
+                        <input type="text" id="textInput" class="input-field"
+                            placeholder="Ketik teksmu..."
+                            value="bikin brat disini">
+                    </div>
+                    <button class="btn-execute" onclick="downloadImage()">📥 Download PNG</button>
+                </div>
+
+                <!-- API URL -->
+                <div class="card">
+                    <p class="label">🔗 API Endpoint</p>
+                    <div class="api-url-block" id="apiUrl">—</div>
+                    <button class="btn-copy" onclick="copyApiUrl()">📋 Copy URL</button>
+                </div>
+
             </div>
         </main>
     </div>
@@ -313,47 +301,43 @@
     }
 
     async function downloadImage() {
-    const container = document.getElementById('memeContainer');
-    
-    try {
-        // Step 1: Screenshot preview (TAJAM, tanpa blur)
-        const sharpCanvas = await html2canvas(container, {
-            backgroundColor: '#ffffff',
-            scale: 3,  // 320px × 3 = 960px
-            useCORS: true,
-            allowTaint: true,
-            logging: false
-        });
+        const container = document.getElementById('memeContainer');
         
-        // Step 2: Bikin canvas baru buat blur
-        const blurredCanvas = document.createElement('canvas');
-        blurredCanvas.width = sharpCanvas.width;
-        blurredCanvas.height = sharpCanvas.height;
-        const ctx = blurredCanvas.getContext('2d');
-        
-        // Step 3: Apply blur + draw canvas tajam
-        ctx.filter = 'blur(4px)';
-        ctx.drawImage(sharpCanvas, 0, 0);
-        ctx.filter = 'none';
-        
-        // Step 4: Download
-        blurredCanvas.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'brat.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('✅ Download selesai!');
-        }, 'image/png');
-        
-        trackUsage();
-    } catch (e) {
-        showToast('❌ Gagal download!', 'error');
+        try {
+            const sharpCanvas = await html2canvas(container, {
+                backgroundColor: '#ffffff',
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                logging: false
+            });
+            
+            const blurredCanvas = document.createElement('canvas');
+            blurredCanvas.width = sharpCanvas.width;
+            blurredCanvas.height = sharpCanvas.height;
+            const ctx = blurredCanvas.getContext('2d');
+            
+            ctx.filter = 'blur(4px)';
+            ctx.drawImage(sharpCanvas, 0, 0);
+            ctx.filter = 'none';
+            
+            blurredCanvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'brat.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('✅ Download selesai!');
+            }, 'image/png');
+            
+            trackUsage();
+        } catch (e) {
+            showToast('❌ Gagal download!', 'error');
+        }
     }
-}
 
     function copyApiUrl() {
         navigator.clipboard.writeText(currentApiUrl).then(() => showToast('✅ URL disalin!'));
