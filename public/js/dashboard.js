@@ -146,29 +146,21 @@ class CursorParticleSystem {
 // ========== WELCOME SCREEN ==========
 function initWelcomeScreen() {
     const welcome = document.getElementById('welcome-screen');
-    if (!welcome) {
-        console.log('Welcome screen element not found');
-        return;
-    }
+    if (!welcome) return;
 
-    // Check if already shown in this session
-    if (sessionStorage.getItem('welcomeShown')) {
+    // Cek localStorage (bukan sessionStorage) biar permanen
+    if (localStorage.getItem('welcomeShown')) {
         welcome.style.display = 'none';
-        console.log('Welcome already shown, hiding');
         return;
     }
 
-    console.log('Showing welcome screen...');
-
-    // Force display block first
     welcome.style.display = 'flex';
 
     setTimeout(() => {
         welcome.classList.add('fade-out');
         setTimeout(() => {
             welcome.style.display = 'none';
-            sessionStorage.setItem('welcomeShown', 'true');
-            console.log('Welcome screen hidden');
+            localStorage.setItem('welcomeShown', 'true');
         }, 1200);
     }, 2500);
 }
