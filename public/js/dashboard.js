@@ -5,6 +5,7 @@ let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
 let prevTotal = 0;
 let uptimeStart = Date.now();
+let uptimeLoaded = false;
 
 // ========== PARTICLE SYSTEM ==========
 class CursorParticleSystem {
@@ -120,7 +121,11 @@ async function fetchUptime() {
         const res = await fetch('/api/uptime');
         if (!res.ok) return;
         const data = await res.json();
-        if (data.startTime) uptimeStart = data.startTime;
+        if (data.startTime) {
+            uptimeStart = data.startTime;
+            uptimeLoaded = true;
+            localStorage.setItem('uptime_fallback', data.startTime);
+        }
     } catch (e) {}
 }
 
@@ -239,9 +244,19 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
     setInterval(fetchStats, 3000);
 
-    // Uptime (safe - ga nge-block)
-    updateUptime();
-    setInterval(updateUptime, 1000);
-    fetchUptime();
+    // UPTIME - Fetch dulu, kalo gagal pake fallback
+    fetchUptime().then(() => {
+        if (!uptimeLoaded) {
+            const fallback = localStorage.getItem('uptime_fallback');
+            if (fallback) uptimeStart = parseInt(fallback);
+            else {
+                uptimeStart = Date.now();
+                localStorage.setItem('uptime_fallback', uptimeStart);
+            }
+        }
+        updateUptime();
+        setInterval(updateUptime, 1000);
+    });
+
     setInterval(fetchUptime, 10000);
 });
