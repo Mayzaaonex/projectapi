@@ -25,34 +25,6 @@
         }
         .nav-link:hover { color: #ccc; background: rgba(255,255,255,0.03); }
         .nav-link.active { color: #fff; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
-        
-        /* Dropdown */
-        .dropdown-btn { position: relative; }
-        .dropdown-btn::after {
-            content: '';
-            position: absolute;
-            right: 14px;
-            width: 10px; height: 10px;
-            background: url("data:image/svg+xml,%3Csvg width='10' height='10' fill='none' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23666' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center no-repeat;
-            transition: transform 0.2s;
-        }
-        .dropdown-btn.open::after { transform: rotate(180deg); }
-        
-        .submenu {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease;
-            margin-left: 12px;
-            border-left: 1px solid rgba(255,255,255,0.06);
-        }
-        .submenu.open { max-height: 500px; }
-        
-        .sub-link {
-            display: flex; align-items: center; gap: 8px; padding: 8px 16px; 
-            font-size: 12.5px; color: #555; transition: all 0.2s; cursor: pointer; 
-            border-radius: 6px; text-decoration: none;
-        }
-        .sub-link:hover { color: #aaa; background: rgba(255,255,255,0.02); }
 
         .stat-card { 
             background: rgba(13, 13, 13, 0.5); backdrop-filter: blur(8px);
@@ -67,9 +39,24 @@
         .credit-bar-bg { background: rgba(255,255,255,0.05); border-radius: 99px; height: 6px; overflow: hidden; width: 100%; }
         .credit-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #a855f7); transition: width 1s ease-in-out; }
 
-        /* Page container */
-        .page { display: none; }
-        .page.active { display: block; }
+        .api-menu-card {
+            background: rgba(13, 13, 13, 0.5); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+            padding: 20px; cursor: pointer; transition: all 0.2s;
+            text-align: center;
+        }
+        .api-menu-card:hover { border-color: rgba(99, 102, 241, 0.3); background: rgba(18, 18, 18, 0.7); }
+
+        /* Modal overlay */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            padding: 28px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;
+        }
     </style>
 </head>
 <body class="text-gray-300">
@@ -87,11 +74,9 @@
                 <span class="text-sm font-semibold text-white tracking-tight">Api-Mayzaa</span>
             </div>
 
-            <!-- NAV -->
             <nav class="flex flex-col gap-1 flex-1">
                 <div class="text-[10px] font-bold text-[#333] uppercase tracking-widest px-3 mb-2">Menu</div>
                 
-                <!-- Dashboard -->
                 <a href="#" class="nav-link active" onclick="setPage('dashboard', this)">
                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                         <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
@@ -102,65 +87,24 @@
                     Dashboard
                 </a>
 
-                <!-- API Dropdown -->
-                <div class="dropdown-btn nav-link" onclick="toggleDropdown(this)" id="api-dropdown">
+                <a href="#" class="nav-link" onclick="setPage('api', this)">
                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                         <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     API
-                </div>
-
-                <!-- Submenu API -->
-                <div class="submenu" id="api-submenu">
-                    <!-- Maker (gepeng dropdown lagi) -->
-                    <div class="dropdown-btn sub-link" onclick="toggleSubDropdown(event, 'maker-sub')" style="position: relative;">
-                        <span>⚙️</span> Maker
-                    </div>
-                    <div class="submenu" id="maker-sub" style="margin-left: 16px; border-left: 1px solid rgba(255,255,255,0.04);">
-                        <a href="#" class="sub-link" onclick="setPage('maker-text', this)">📝 Text Pro</a>
-                        <a href="#" class="sub-link" onclick="setPage('maker-image', this)">🖼️ Image Gen</a>
-                        <a href="#" class="sub-link" onclick="setPage('maker-sticker', this)">🌟 Sticker</a>
-                    </div>
-
-                    <a href="#" class="sub-link" onclick="setPage('downloader', this)">
-                        <span>⬇️</span> Downloader
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('stalker', this)">
-                        <span>👁️</span> Stalker
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('tools', this)">
-                        <span>🔧</span> Tools
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('nsfw', this)">
-                        <span>🔞</span> NSFW
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('ai', this)">
-                        <span>🤖</span> AI Chat
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('islami', this)">
-                        <span>☪️</span> Islami
-                    </a>
-                    <a href="#" class="sub-link" onclick="setPage('other', this)">
-                        <span>📦</span> Other
-                    </a>
-                </div>
+                </a>
             </nav>
 
             <div class="text-[10px] text-[#333] px-2">Copyright © RianModss</div>
         </aside>
 
         <!-- MAIN CONTENT -->
-        <main class="flex-1 overflow-y-auto p-6 md:p-10 flex items-center justify-center">
+        <main class="flex-1 overflow-y-auto p-6 md:p-10">
             
             <!-- DASHBOARD PAGE -->
-            <div id="page-dashboard" class="page active w-full max-w-4xl">
-                <div class="mb-8 text-center">
-                    <h1 class="text-xl font-bold text-white tracking-tight">Dashboard Overview</h1>
-                    <p class="text-sm text-gray-600 mt-1">Status dan penggunaan API saat ini.</p>
-                </div>
-
-                <!-- 3 Cards Rata Tengah -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <div id="page-dashboard" class="page w-full max-w-4xl mx-auto">
+                <!-- 3 Cards Rata Atas Tengah -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
                     <div class="stat-card">
                         <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Status Sistem</p>
                         <div class="flex items-center justify-center gap-2">
@@ -168,12 +112,10 @@
                             <span class="text-sm font-semibold text-white">Operational</span>
                         </div>
                     </div>
-
                     <div class="stat-card">
                         <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Uptime</p>
                         <span id="stat-uptime" class="text-2xl font-bold text-white mono">99.98%</span>
                     </div>
-
                     <div class="stat-card">
                         <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Kredit Bulan Ini</p>
                         <span id="stat-kredit" class="text-2xl font-bold text-white mono">6.800</span>
@@ -182,83 +124,126 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Overview bawah -->
+                <div class="text-center text-gray-600 text-sm">
+                    <p><span class="text-white font-semibold"></span></p>
+                </div>
             </div>
 
-            <!-- API SUB PAGES (contoh) -->
-            <div id="page-maker-text" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">📝 Maker Text Pro</h1>
-                <p class="text-gray-600 mt-2">Endpoint maker teks akan tampil di sini.</p>
-            </div>
-            <div id="page-maker-image" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">🖼️ Image Generator</h1>
-                <p class="text-gray-600 mt-2">Endpoint image generator.</p>
-            </div>
-            <div id="page-maker-sticker" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">🌟 Sticker Maker</h1>
-                <p class="text-gray-600 mt-2">Endpoint sticker maker.</p>
-            </div>
-            <div id="page-downloader" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">⬇️ Downloader</h1>
-                <p class="text-gray-600 mt-2">Endpoint downloader.</p>
-            </div>
-            <div id="page-stalker" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">👁️ Stalker</h1>
-                <p class="text-gray-600 mt-2">Endpoint stalker.</p>
-            </div>
-            <div id="page-tools" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">🔧 Tools</h1>
-                <p class="text-gray-600 mt-2">Endpoint tools.</p>
-            </div>
-            <div id="page-nsfw" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">🔞 NSFW</h1>
-                <p class="text-gray-600 mt-2">Endpoint NSFW.</p>
-            </div>
-            <div id="page-ai" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">🤖 AI Chat</h1>
-                <p class="text-gray-600 mt-2">Endpoint AI Chat.</p>
-            </div>
-            <div id="page-islami" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">☪️ Islami</h1>
-                <p class="text-gray-600 mt-2">Endpoint Islami.</p>
-            </div>
-            <div id="page-other" class="page w-full max-w-4xl text-center">
-                <h1 class="text-xl font-bold text-white">📦 Other</h1>
-                <p class="text-gray-600 mt-2">Endpoint lainnya.</p>
+            <!-- API PAGE -->
+            <div id="page-api" class="page w-full" style="display: none;">
+                <div class="mb-8">
+                    <h1 class="text-xl font-bold text-white">API Endpoints</h1>
+                    <p class="text-sm text-gray-600 mt-1">Pilih kategori endpoint yang tersedia.</p>
+                </div>
+
+                <!-- Grid 3 Kolom -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="api-grid">
+                    <!-- Maker -->
+                    <div class="api-menu-card" onclick="openSubApi('maker')">
+                        <p class="text-2xl mb-2">⚙️</p>
+                        <p class="text-white font-semibold text-sm">Maker</p>
+                        <p class="text-[11px] text-gray-600 mt-1">Text, Image, Sticker</p>
+                    </div>
+
+                    <!-- Downloader -->
+                    <div class="api-menu-card" onclick="openSubApi('downloader')">
+                        <p class="text-2xl mb-2">⬇️</p>
+                        <p class="text-white font-semibold text-sm">Downloader</p>
+                        <p class="text-[11px] text-gray-600 mt-1">Tiktok, YouTube, IG</p>
+                    </div>
+
+                    <!-- Tools -->
+                    <div class="api-menu-card" onclick="openSubApi('tools')">
+                        <p class="text-2xl mb-2">🔧</p>
+                        <p class="text-white font-semibold text-sm">Tools</p>
+                        <p class="text-[11px] text-gray-600 mt-1">Stalker, Nulis, DLL</p>
+                    </div>
+                </div>
             </div>
 
         </main>
     </div>
 
+    <!-- MODAL SUB-API -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-lg font-bold text-white" id="modal-title">Sub Menu</h2>
+                <button onclick="closeModalDirect()" class="text-gray-500 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+            <div id="modal-content" class="space-y-3"></div>
+        </div>
+    </div>
+
     <script>
-        // Page switching
         function setPage(page, el) {
             event.preventDefault();
-            // Sembunyikan semua page
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Tampilkan page target
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             const target = document.getElementById('page-' + page);
-            if (target) target.classList.add('active');
-            // Update nav active
+            if (target) target.style.display = 'block';
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            if (el && el.classList.contains('nav-link')) el.classList.add('active');
-            // Highlight API dropdown kalo submenu diklik
-            if (page !== 'dashboard') {
-                document.getElementById('api-dropdown').classList.add('active');
+            if (el) el.classList.add('active');
+        }
+
+        // Sub API data
+        const subApiData = {
+            maker: {
+                title: 'Maker Endpoints',
+                items: [
+                    { name: 'Brat Generator', icon: '🟢', desc: 'Buat teks gaya Brat', endpoint: '/api/maker/brat' },
+                    { name: 'Text Pro', icon: '📝', desc: 'Text styling premium', endpoint: '/api/maker/textpro' },
+                    { name: 'Image Gen', icon: '🖼️', desc: 'Generate gambar AI', endpoint: '/api/maker/image' },
+                    { name: 'Sticker', icon: '🌟', desc: 'Buat stiker WA', endpoint: '/api/maker/sticker' }
+                ]
+            },
+            downloader: {
+                title: 'Downloader Endpoints',
+                items: [
+                    { name: 'TikTok', icon: '🎵', desc: 'Download video TikTok', endpoint: '/api/downloader/tiktok' },
+                    { name: 'YouTube', icon: '▶️', desc: 'Download video YT', endpoint: '/api/downloader/yt' },
+                    { name: 'Instagram', icon: '📷', desc: 'Download post/reel IG', endpoint: '/api/downloader/ig' }
+                ]
+            },
+            tools: {
+                title: 'Tools Endpoints',
+                items: [
+                    { name: 'Stalker IG', icon: '👁️', desc: 'Stalk profil Instagram', endpoint: '/api/tools/stalkig' },
+                    { name: 'Nulis', icon: '✍️', desc: 'Teks ke gambar nulis', endpoint: '/api/tools/nulis' },
+                    { name: 'OCR', icon: '🔍', desc: 'Ekstrak teks gambar', endpoint: '/api/tools/ocr' }
+                ]
+            }
+        };
+
+        function openSubApi(key) {
+            const data = subApiData[key];
+            if (!data) return;
+            document.getElementById('modal-title').textContent = data.title;
+            const content = document.getElementById('modal-content');
+            content.innerHTML = data.items.map(item => `
+                <div class="bg-[#1a1a1a] border border-zinc-800 rounded-xl p-4 hover:border-indigo-500/30 transition-all cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${item.icon}</span>
+                        <div class="flex-1">
+                            <p class="text-white text-sm font-semibold">${item.name}</p>
+                            <p class="text-[11px] text-gray-600">${item.desc}</p>
+                        </div>
+                        <code class="text-[10px] bg-zinc-900 px-2 py-1 rounded text-gray-500 mono">${item.endpoint}</code>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        function closeModal(e) {
+            if (e.target === document.getElementById('modal-overlay')) {
+                document.getElementById('modal-overlay').classList.remove('show');
             }
         }
 
-        // Dropdown API
-        function toggleDropdown(el) {
-            el.classList.toggle('open');
-            document.getElementById('api-submenu').classList.toggle('open');
-        }
-
-        // Sub dropdown Maker
-        function toggleSubDropdown(e, id) {
-            e.stopPropagation();
-            const sub = document.getElementById(id);
-            sub.classList.toggle('open');
-            e.target.classList.toggle('open');
+        function closeModalDirect() {
+            document.getElementById('modal-overlay').classList.remove('show');
         }
 
         // Auto update stats
