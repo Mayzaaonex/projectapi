@@ -4,29 +4,29 @@ $apiList = [
         'name' => 'Brat Generator',
         'icon' => '🟢',
         'desc' => 'Buat teks gaya Brat dengan custom background & text color.',
-        'endpoint' => '/maker/brat.php',
-        'link' => 'brat.php'
+        'endpoint' => '/maker/brat',
+        'link' => '/maker/brat'
     ],
     [
         'name' => 'Text Pro',
         'icon' => '📝',
         'desc' => 'Text styling premium dengan berbagai efek keren.',
-        'endpoint' => '/maker/textpro.php',
-        'link' => 'textpro.php'
+        'endpoint' => '/maker/textpro',
+        'link' => '/maker/textpro'
     ],
     [
         'name' => 'Image Generator',
         'icon' => '🖼️',
         'desc' => 'Generate gambar AI dengan prompt custom.',
-        'endpoint' => '/maker/image.php',
-        'link' => 'image.php'
+        'endpoint' => '/maker/image',
+        'link' => '/maker/image'
     ],
     [
         'name' => 'Sticker Maker',
         'icon' => '🌟',
         'desc' => 'Buat stiker WhatsApp dari gambar atau teks.',
-        'endpoint' => '/maker/sticker.php',
-        'link' => 'sticker.php'
+        'endpoint' => '/maker/sticker',
+        'link' => '/maker/sticker'
     ]
 ];
 ?>
@@ -38,7 +38,7 @@ $apiList = [
     <title>Maker API - Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../public/style.css">
+    <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
     <div class="flex h-screen overflow-hidden">

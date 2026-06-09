@@ -1,48 +1,11 @@
 <?php
-$pageTitle = 'Downloader API';
 $downloadList = [
-    [
-        'name' => 'TikTok',
-        'icon' => '🎵',
-        'desc' => 'Download video TikTok tanpa watermark.',
-        'endpoint' => '/downloader/tiktok.php',
-        'link' => 'tiktok.php'
-    ],
-    [
-        'name' => 'YouTube',
-        'icon' => '▶️',
-        'desc' => 'Download video YouTube berbagai resolusi.',
-        'endpoint' => '/downloader/yt.php',
-        'link' => 'yt.php'
-    ],
-    [
-        'name' => 'Instagram',
-        'icon' => '📷',
-        'desc' => 'Download post, reel & story Instagram.',
-        'endpoint' => '/downloader/ig.php',
-        'link' => 'ig.php'
-    ],
-    [
-        'name' => 'Facebook',
-        'icon' => '📘',
-        'desc' => 'Download video Facebook HD.',
-        'endpoint' => '/downloader/fb.php',
-        'link' => 'fb.php'
-    ],
-    [
-        'name' => 'Twitter/X',
-        'icon' => '🐦',
-        'desc' => 'Download video & GIF dari Twitter.',
-        'endpoint' => '/downloader/twitter.php',
-        'link' => 'twitter.php'
-    ],
-    [
-        'name' => 'SnackVideo',
-        'icon' => '🍿',
-        'desc' => 'Download video SnackVideo tanpa watermark.',
-        'endpoint' => '/downloader/snack.php',
-        'link' => 'snack.php'
-    ]
+    ['name' => 'TikTok', 'icon' => '🎵', 'desc' => 'Download video TikTok tanpa watermark.', 'endpoint' => '/downloader/tiktok', 'link' => '/downloader/tiktok'],
+    ['name' => 'YouTube', 'icon' => '▶️', 'desc' => 'Download video YouTube berbagai resolusi.', 'endpoint' => '/downloader/yt', 'link' => '/downloader/yt'],
+    ['name' => 'Instagram', 'icon' => '📷', 'desc' => 'Download post, reel & story Instagram.', 'endpoint' => '/downloader/ig', 'link' => '/downloader/ig'],
+    ['name' => 'Facebook', 'icon' => '📘', 'desc' => 'Download video Facebook HD.', 'endpoint' => '/downloader/fb', 'link' => '/downloader/fb'],
+    ['name' => 'Twitter/X', 'icon' => '🐦', 'desc' => 'Download video & GIF dari Twitter.', 'endpoint' => '/downloader/twitter', 'link' => '/downloader/twitter'],
+    ['name' => 'SnackVideo', 'icon' => '🍿', 'desc' => 'Download video SnackVideo tanpa watermark.', 'endpoint' => '/downloader/snack', 'link' => '/downloader/snack']
 ];
 ?>
 <!DOCTYPE html>
@@ -53,7 +16,7 @@ $downloadList = [
     <title>Downloader API - Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../public/style.css">
+    <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
     <div class="flex h-screen overflow-hidden">
@@ -63,13 +26,11 @@ $downloadList = [
         <main class="flex-1 overflow-y-auto p-8">
             <div class="max-w-4xl mx-auto">
                 
-                <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-2xl font-bold text-white">⬇️ Downloader API</h1>
                     <p class="text-sm text-slate-400 mt-1">Pilih platform untuk mendownload konten.</p>
                 </div>
 
-                <!-- Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     <?php foreach ($downloadList as $api): ?>
                     <a href="<?php echo $api['link']; ?>" class="api-menu-card text-center">
@@ -81,7 +42,6 @@ $downloadList = [
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Info -->
                 <div class="mt-10 bg-slate-900 border border-slate-800 rounded-2xl p-6">
                     <h3 class="text-white font-semibold text-sm mb-2">📌 Cara Penggunaan</h3>
                     <div class="text-xs text-slate-400 space-y-2">

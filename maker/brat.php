@@ -70,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
     $generatedImage = 'data:image/png;base64,' . base64_encode($imageData);
     imagedestroy($img);
     
-    $apiUrl = "https://{$_SERVER['HTTP_HOST']}/api-dashboard/maker/brat.php?text=" . urlencode($text) . "&bgColor=" . urlencode($bgColor) . "&textColor=" . urlencode($textColor);
+    // API URL untuk Vercel
+    $apiUrl = "https://{$_SERVER['HTTP_HOST']}/maker/brat?text=" . urlencode($text) . "&bgColor=" . urlencode($bgColor) . "&textColor=" . urlencode($textColor);
 }
 ?>
 <!DOCTYPE html>
@@ -81,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['text'])) {
     <title>Brat Generator - Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../public/style.css">
+    <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
     <div class="flex h-screen overflow-hidden">

@@ -11,7 +11,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
                 <path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
-        <a href="/api-dashboard/index.php" class="text-sm font-bold text-white tracking-tight no-underline hover:opacity-80 transition">
+        <a href="/" class="text-sm font-bold text-white tracking-tight no-underline hover:opacity-80 transition">
             API-MAYZAA
         </a>
     </div>
@@ -21,8 +21,8 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
         <div class="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-3 mb-2">Main Menu</div>
         
         <!-- Dashboard -->
-        <a href="/api-dashboard/index.php" 
-           class="nav-link <?php echo ($currentPage == 'index.php' && $currentDir != 'maker') ? 'active' : ''; ?>">
+        <a href="/" 
+           class="nav-link <?php echo ($currentPage == 'index.php' && $currentDir != 'maker' && $currentDir != 'downloader') ? 'active' : ''; ?>">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
                 <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
@@ -33,7 +33,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
         </a>
 
         <!-- Maker -->
-        <a href="/api-dashboard/maker/index.php" 
+        <a href="/maker/" 
            class="nav-link <?php echo ($currentDir == 'maker') ? 'active' : ''; ?>">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                 <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,7 +42,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
         </a>
 
         <!-- Downloader -->
-        <a href="/api-dashboard/downloader/index.php" 
+        <a href="/downloader/" 
            class="nav-link <?php echo ($currentDir == 'downloader') ? 'active' : ''; ?>">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                 <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 11l5 5 5-5M12 4v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
