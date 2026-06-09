@@ -354,13 +354,19 @@
     let trackTimeout;
     function trackUsage() {
         clearTimeout(trackTimeout);
-        trackTimeout = setTimeout(() => {
-            let stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
-            stats.total++;
-            stats.credits++;
-            stats.history.push({ time: new Date().toISOString(), type: 'brat' });
-            if (stats.history.length > 100) stats.history = stats.history.slice(-100);
-            localStorage.setItem('api_stats', JSON.stringify(stats));
+        trackTimeout = setTimeout(async () => {
+            try {
+                await fetch('/api/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'brat' })
+                });
+            } catch (e) {
+                let stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0}');
+                stats.total++;
+                stats.credits++;
+                localStorage.setItem('api_stats', JSON.stringify(stats));
+            }
         }, 500);
     }
 

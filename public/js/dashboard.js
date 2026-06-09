@@ -1,4 +1,5 @@
 const MAX_HISTORY = 24;
+const API_STATS_URL = '/api/stats';
 let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
@@ -37,41 +38,39 @@ function initChart() {
     });
 }
 
-function updateStats() {
-    if (!trafficChart) return;
+async function fetchStats() {
+    try {
+        const res = await fetch(API_STATS_URL);
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        const now = new Date();
+        const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
 
-    const stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
-    const now = new Date();
-    const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+        const newRequests = Math.max(0, (data.total || 0) - prevTotal);
+        prevTotal = data.total || 0;
 
-    // Hit new requests since last check
-    const newRequests = Math.max(0, stats.total - prevTotal);
-    prevTotal = stats.total;
+        if (trafficChart) {
+            trafficData.push(newRequests);
+            trafficData.shift();
+            trafficLabels.push(timeStr);
+            trafficLabels.shift();
+            trafficChart.data.datasets[0].data = [...trafficData];
+            trafficChart.data.labels = [...trafficLabels];
+            trafficChart.update('active');
+        }
 
-    trafficData.push(newRequests);
-    trafficData.shift();
-    trafficLabels.push(timeStr);
-    trafficLabels.shift();
-
-    trafficChart.data.datasets[0].data = [...trafficData];
-    trafficChart.data.labels = [...trafficLabels];
-    trafficChart.update('active');
-
-    // Update cards
-    document.getElementById('total-requests').textContent = stats.total.toLocaleString();
-    document.getElementById('credits-used').textContent = stats.credits.toLocaleString();
-    document.getElementById('credit-bar').style.width = Math.min(100, stats.credits / 100) + '%';
+        document.getElementById('total-requests').textContent = (data.total || 0).toLocaleString();
+        document.getElementById('credits-used').textContent = (data.credits || 0).toLocaleString();
+        document.getElementById('credit-bar').style.width = Math.min(100, (data.credits || 0) / 100) + '%';
+    } catch (e) {
+        console.log('Menunggu data...');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     Sidebar.render('dashboard');
-    
-    // Init stats localStorage kalo kosong
-    if (!localStorage.getItem('api_stats')) {
-        localStorage.setItem('api_stats', JSON.stringify({ total: 0, credits: 0, history: [] }));
-    }
-    
     initChart();
-    setInterval(updateStats, 2000);
-    updateStats();
+    fetchStats();
+    setInterval(fetchStats, 2000);
 });
