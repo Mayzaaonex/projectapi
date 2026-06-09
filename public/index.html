@@ -1,59 +1,63 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>API Manager</title>
-</head>
-<body class="bg-gray-900 text-white flex min-h-screen">
-
-    <!-- Sidebar -->
-    <div class="w-64 bg-gray-800 p-6">
-        <h2 class="text-xl font-bold mb-8 text-blue-400">API DASHBOARD</h2>
-        <nav class="space-y-4">
-            <a href="#" class="block py-2 px-4 bg-gray-700 rounded">Status Server</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700 rounded">API Logs</a>
-            <a href="#" class="block py-2 px-4 hover:bg-gray-700 rounded">Settings</a>
-        </nav>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 p-10">
-        <h1 class="text-3xl font-bold mb-6">Overview</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Card 1 -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <p class="text-gray-400">Server Status</p>
-                <h3 id="status" class="text-2xl font-bold mt-2 text-green-500">Memuat...</h3>
-            </div>
-            <!-- Card 2 -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <p class="text-gray-400">Total Request</p>
-                <h3 class="text-2xl font-bold mt-2">1,204</h3>
-            </div>
-            <!-- Card 3 -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                <p class="text-gray-400">Latency</p>
-                <h3 class="text-2xl font-bold mt-2">45ms</h3>
-            </div>
-        </div>
-
-        <div class="mt-10 bg-gray-800 p-6 rounded-lg">
-            <h2 class="font-bold mb-4">Live Activity</h2>
-            <div id="logs" class="bg-black p-4 rounded font-mono text-sm h-40 overflow-y-auto text-green-400">
-                [SYSTEM] Initializing...
-            </div>
-        </div>
-    </div>
-
     <script>
-        async function fetchStatus() {
-            const res = await fetch('/api/status');
-            const data = await res.json();
-            document.getElementById('status').innerText = data.status.toUpperCase();
-            document.getElementById('logs').innerHTML += `<br>> Status updated: ${data.timestamp}`;
+        tailwind.config = {
+            theme: { extend: { colors: { brat: '#88cc00' } } }
         }
-        fetchStatus();
     </script>
+    <style>
+        .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 font-sans selection:bg-brat selection:text-black">
+
+    <div class="flex min-h-screen">
+        <aside class="w-64 border-r border-white/10 p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-white mb-10 flex items-center gap-2">
+                    <span class="w-3 h-3 bg-brat rounded-full"></span> BratGen
+                </h1>
+                <nav class="space-y-2">
+                    <a href="#" class="block py-2 px-3 bg-white/5 rounded-lg border border-white/10">Generator</a>
+                    <a href="#" class="block py-2 px-3 hover:bg-white/5 transition rounded-lg">Analytics</a>
+                    <a href="#" class="block py-2 px-3 hover:bg-white/5 transition rounded-lg">API Docs</a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-10">
+            <header class="flex justify-between items-center mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold">Generator Dashboard</h2>
+                    <p class="text-gray-500">Bikin grafis ala Brat secara instan.</p>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brat opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brat"></span>
+                    </span>
+                    <span class="text-brat">API Operational</span>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass p-6 rounded-2xl flex flex-col items-center justify-center h-80">
+                    <div id="preview" class="w-full h-40 bg-brat flex items-center justify-center text-black font-black text-5xl uppercase tracking-tighter">
+                        brat
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl">
+                    <h3 class="mb-4 font-semibold text-white">Generator Settings</h3>
+                    <input type="text" placeholder="Masukkan teks..." class="w-full bg-black/50 border border-white/10 p-3 rounded-lg mb-4 focus:border-brat outline-none transition">
+                    <button class="w-full bg-brat text-black font-bold py-3 rounded-lg hover:bg-white transition">Generate Image</button>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
