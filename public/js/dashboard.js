@@ -237,9 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
     new CursorParticleSystem();
     initChart();
 
-    fetchUptime().then(() => updateUptime());
-    fetchStats();
+    // Fetch uptime dulu, baru start timer
+    fetchUptime().then(() => {
+        updateUptime();
+        setInterval(updateUptime, 1000);
+    });
 
+    fetchStats();
     setInterval(fetchStats, 3000);
-    setInterval(updateUptime, 1000);
 });
