@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     { "src": "**/*.html", "use": "@vercel/static" },
-    { "src": "**/*.js", "use": "@vercel/node" }
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/track", "dest": "/api/track.js" },
@@ -13,6 +13,9 @@
     { "src": "/tools", "dest": "/menu/tools/index.html" },
     { "src": "/ai", "dest": "/menu/ai/index.html" },
     { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/sidebar.js", "dest": "/sidebar.js" },
+    { "src": "/dashboard.css", "dest": "/dashboard.css" },
+    { "src": "/dashboard.js", "dest": "/dashboard.js" },
     { "src": "/", "dest": "/index.html" }
   ]
 }

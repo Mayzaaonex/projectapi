@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI API - Api-Mayzaa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/dashboard.css">
+    <style>
+        .api-menu-card {
+            background: linear-gradient(135deg, rgba(15,15,15,0.9), rgba(10,10,10,0.95));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 28px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+            backdrop-filter: blur(10px);
+        }
+        .api-menu-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-6px);
+        }
+    </style>
+</head>
+<body>
+    <div class="flex h-screen overflow-hidden">
+        <div id="sidebar-container"></div>
+
+        <main class="flex-1 overflow-y-auto p-8 ml-56">
+            <div class="max-w-4xl mx-auto">
+
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-white">🤖 AI API</h1>
+                    <p class="text-sm text-slate-400 mt-1">Layanan Artificial Intelligence siap pakai.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <a href="/ai/chatgpt" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">💬</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">ChatGPT</h3>
+                        <p class="text-xs text-slate-500 mb-3">OpenAI GPT chat completion.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/chatgpt</code>
+                    </a>
+
+                    <a href="/ai/gemini" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">🧠</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">Gemini</h3>
+                        <p class="text-xs text-slate-500 mb-3">Google Gemini AI chat.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/gemini</code>
+                    </a>
+
+                    <a href="/ai/dalle" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">🎨</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">DALL-E</h3>
+                        <p class="text-xs text-slate-500 mb-3">Generate gambar dari teks.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/dalle</code>
+                    </a>
+
+                    <a href="/ai/midjourney" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">🖼️</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">Midjourney</h3>
+                        <p class="text-xs text-slate-500 mb-3">AI art generator premium.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/midjourney</code>
+                    </a>
+
+                    <a href="/ai/tts" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">🔊</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">Text to Speech</h3>
+                        <p class="text-xs text-slate-500 mb-3">Ubah teks jadi suara.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/tts</code>
+                    </a>
+
+                    <a href="/ai/stt" class="api-menu-card text-center">
+                        <span class="text-4xl mb-4 block">🎤</span>
+                        <h3 class="text-white font-semibold text-sm mb-2">Speech to Text</h3>
+                        <p class="text-xs text-slate-500 mb-3">Ubah suara jadi teks.</p>
+                        <code class="text-[10px] bg-slate-950 text-slate-500 px-3 py-1 rounded-full mono">/ai/stt</code>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="/sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => Sidebar.render('ai'));
+    </script>
+</body>
+</html>
