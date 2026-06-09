@@ -1,203 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brat API - Api-Mayzaa</title>
+    <title>Brat Generator - Api-Mayzaa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/public/css/style.css">
-    <style>
-        @font-face {
-            font-family: 'timesregular';
-            src: url('https://www.bratgenerator.com/sites/g/files/g2000017981/files/2024-01/times-roman-01-webfont.woff') format('woff'),
-                 url('https://www.bratgenerator.com/sites/g/files/g2000017981/files/2024-01/times-roman-01-webfont.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'arial_narrowregular';
-            src: url('https://www.bratgenerator.com/sites/g/files/g2000017981/files/2024-03/arial_narrow-webfont.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        #memeContainer {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            min-height: 70vh;
-            background-color: #8ACE00;
-        }
-
-        #textInput {
-            margin: 14px auto;
-            padding: 0 1vw 0.5vw 1vw;
-            font-size: 18px;
-            border: 1px solid #d1d1d1;
-            border-radius: 16px;
-            max-width: 450px;
-            width: 90%;
-            display: block;
-            font-family: 'timesregular', serif;
-            text-align: center;
-            height: 50px;
-            line-height: 50px;
-            outline: none;
-            position: relative;
-            z-index: 50;
-        }
-
-        #textOverlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-            color: #000000;
-            font-family: 'arial_narrowregular', "Arial Narrow", sans-serif;
-            font-size: 100px;
-            text-align: justify;
-            text-align-last: justify;
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            height: 300px;
-        }
-
-        #textOverlay span.textFitted {
-            font-weight: 500;
-            font-family: 'arial_narrowregular', "Arial Narrow", sans-serif;
-            font-size: 100px;
-            filter: blur(2px);
-            display: inline-block;
-        }
-
-        #screenshot-blurb {
-            font-size: 14px;
-            font-family: 'arial_narrowregular';
-            margin: 10px 0 20px 0;
-            text-transform: capitalize;
-            color: #000;
-        }
-
-        .btn-copy {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'arial_narrowregular', sans-serif;
-        }
-
-        .btn-copy:hover {
-            opacity: 0.8;
-        }
-
-        .api-url-text {
-            font-size: 11px;
-            color: #555;
-            margin-top: 8px;
-            font-family: monospace;
-            word-break: break-all;
-            max-width: 500px;
-        }
-
-        @media only screen and (max-width: 1024px) {
-            #textOverlay {
-                width: 350px;
-                height: 350px;
-                padding: 0;
-                font-size: 70px !important;
-            }
-            #memeContainer {
-                min-height: 60vh;
-            }
-        }
-    </style>
 </head>
 <body>
-
     <div class="flex h-screen overflow-hidden">
         
         <div id="sidebar-container"></div>
-
-        <!-- Overlay sidebar -->
         <div class="sidebar-overlay" id="sidebar-overlay" onclick="Sidebar.close()"></div>
 
-        <main class="flex-1 overflow-y-auto" style="margin-left: 224px; background: #fff;">
-            
-            <!-- Brat Container fullscreen -->
-            <div id="memeContainer">
-                <div id="textOverlay"></div>
-            </div>
-
-            <div style="text-align: center; padding: 10px 20px;">
-                <input type="text" id="textInput" value="brat and it's completely different but also still brat">
-                <div id="screenshot-blurb">Take a Screenshot to Save!</div>
+        <main class="flex-1 overflow-y-auto p-8 ml-56">
+            <div class="max-w-4xl mx-auto">
                 
-                <button class="btn-copy" onclick="copyApiUrl()">📋 Copy API URL</button>
-                <div class="api-url-text" id="apiUrlDisplay"></div>
-            </div>
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-white">🟢 Brat Generator</h1>
+                    <p class="text-sm text-slate-400 mt-1">Buat teks gaya Brat dengan custom warna.</p>
+                </div>
 
+                <!-- Input -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+                    <div class="mb-4">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Text</label>
+                        <input type="text" id="textInput" required 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition"
+                            placeholder="Masukkan teks...">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Background</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="bgColorPicker" value="#8ACE00"
+                                    onchange="document.getElementById('bgColorInput').value = this.value.replace('#', '')">
+                                <input type="text" id="bgColorInput" value="8ACE00" placeholder="8ACE00"
+                                    class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mono">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Text Color</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="textColorPicker" value="#000000"
+                                    onchange="document.getElementById('textColorInput').value = this.value.replace('#', '')">
+                                <input type="text" id="textColorInput" value="000000" placeholder="000000"
+                                    class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="generateBrat()" class="btn-execute">⚡ Execute</button>
+                </div>
+
+                <!-- Result -->
+                <div id="resultContainer" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-white font-semibold">✅ Hasil Generate</h3>
+                        <button onclick="downloadImage()" class="text-xs bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition">📥 Download</button>
+                    </div>
+                    <div class="flex justify-center mb-6">
+                        <img id="resultImage" alt="Generated" class="result-image">
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                        <p class="text-xs text-slate-400 mb-2 font-bold uppercase">🔗 API Endpoint</p>
+                        <code id="apiUrl" class="code-block block"></code>
+                        <button onclick="copyApiUrl()" class="mt-3 text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">📋 Copy URL</button>
+                    </div>
+                </div>
+
+            </div>
         </main>
     </div>
 
-    <script src="https://libraries.wmgartistservices.com/jslibrary/jquery.min.js"></script>
-
-    <!-- textFit.js -->
+    <script src="/public/js/sidebar.js"></script>
     <script>
-    (function(root,factory){"use strict";if(typeof define==="function"&&define.amd){define([],factory)}else if(typeof exports==="object"){module.exports=factory()}else{root.textFit=factory()}})(typeof global==="object"?global:this,function(){"use strict";var defaultSettings={alignVert:false,alignHoriz:false,multiLine:true,detectMultiLine:true,minFontSize:8,maxFontSize:80,reProcess:true,widthOnly:false,alignVertWithFlexbox:false};return function textFit(els,options){if(!options)options={};var settings={};for(var key in defaultSettings){if(options.hasOwnProperty(key)){settings[key]=options[key]}else{settings[key]=defaultSettings[key]}}if(typeof els.toArray==="function"){els=els.toArray()}var elType=Object.prototype.toString.call(els);if(elType!=='[object Array]'&&elType!=='[object NodeList]'&&elType!=='[object HTMLCollection]'){els=[els]}for(var i=0;i<els.length;i++){processItem(els[i],settings)}};function processItem(el,settings){if(!isElement(el)||(!settings.reProcess&&el.getAttribute('textFitted'))){return false}if(!settings.reProcess){el.setAttribute('textFitted',1)}var innerSpan,originalHTML,originalWidth,originalHeight;var low,mid,high;originalHTML=el.innerHTML;originalWidth=innerWidth(el);originalHeight=innerHeight(el);if(!originalWidth||(!settings.widthOnly&&!originalHeight)){if(!settings.widthOnly)throw new Error('Set a static height and width on the target element '+el.outerHTML+' before using textFit!');else throw new Error('Set a static width on the target element '+el.outerHTML+' before using textFit!')}if(originalHTML.indexOf('textFitted')===-1){innerSpan=document.createElement('span');innerSpan.className='textFitted';innerSpan.style['display']='inline-block';innerSpan.innerHTML=originalHTML;el.innerHTML='';el.appendChild(innerSpan)}else{innerSpan=el.querySelector('span.textFitted');if(hasClass(innerSpan,'textFitAlignVert')){innerSpan.className=innerSpan.className.replace('textFitAlignVert','');innerSpan.style['height']='';el.className.replace('textFitAlignVertFlex','')}}if(settings.alignHoriz){el.style['text-align']='center';innerSpan.style['text-align']='center'}var multiLine=settings.multiLine;if(settings.detectMultiLine&&!multiLine&&innerSpan.getBoundingClientRect().height>=parseInt(window.getComputedStyle(innerSpan)['font-size'],10)*2){multiLine=true}if(!multiLine){el.style['white-space']='nowrap'}low=settings.minFontSize;high=settings.maxFontSize;var size=low;while(low<=high){mid=(high+low)>>1;innerSpan.style.fontSize=mid+'px';var innerSpanBoundingClientRect=innerSpan.getBoundingClientRect();if(innerSpanBoundingClientRect.width<=originalWidth&&(settings.widthOnly||innerSpanBoundingClientRect.height<=originalHeight)){size=mid;low=mid+1}else{high=mid-1}}if(innerSpan.style.fontSize!=size+'px')innerSpan.style.fontSize=size+'px'}function innerHeight(el){var style=window.getComputedStyle(el,null);return el.getBoundingClientRect().height-parseInt(style.getPropertyValue('padding-top'),10)-parseInt(style.getPropertyValue('padding-bottom'),10)}function innerWidth(el){var style=window.getComputedStyle(el,null);return el.getBoundingClientRect().width-parseInt(style.getPropertyValue('padding-left'),10)-parseInt(style.getPropertyValue('padding-right'),10)}function isElement(o){return(typeof HTMLElement==="object"?o instanceof HTMLElement:o&&typeof o==="object"&&o!==null&&o.nodeType===1&&typeof o.nodeName==="string")}function hasClass(element,cls){return(' '+element.className+' ').indexOf(' '+cls+' ')>-1}});
-    </script>
+        document.addEventListener('DOMContentLoaded', () => Sidebar.render('maker'));
 
-    <script>
-        const textInput = document.getElementById('textInput');
-        const textOverlay = document.getElementById('textOverlay');
+        let currentImageData = null;
+        let currentApiUrl = '';
 
-        textOverlay.innerText = textInput.value;
-        textFit(textOverlay, { maxFontSize: 70 });
+        function generateBrat() {
+            const text = document.getElementById('textInput').value;
+            if (!text) return showToast('❌ Masukkan teks dulu!', 'error');
 
-        textInput.addEventListener('input', function(){
-            textOverlay.innerText = this.value;
-            textFit(textOverlay, { maxFontSize: 70 });
-            
-            // Track usage
-            trackUsage();
-        });
+            const bgColor = document.getElementById('bgColorInput').value || '8ACE00';
+            const textColor = document.getElementById('textColorInput').value || '000000';
 
-        // Copy API URL
-        function copyApiUrl() {
-            const text = encodeURIComponent(textInput.value);
-            const url = `${window.location.origin}/maker/brat?text=${text}`;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('✅ API URL copied!');
-            });
-            document.getElementById('apiUrlDisplay').textContent = url;
-        }
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 1080;
+            const ctx = canvas.getContext('2d');
 
-        // Track ke localStorage
-        function trackUsage() {
-            let stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
+            // Background
+            ctx.fillStyle = '#' + bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text
+            ctx.fillStyle = '#' + textColor;
+            ctx.font = 'bold 80px "Inter", "Arial Black", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const words = text.toUpperCase().split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (let word of words) {
+                const testLine = currentLine + word + ' ';
+                if (ctx.measureText(testLine).width > canvas.width - 100) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            lines.push(currentLine.trim());
+
+            const lineHeight = 90;
+            const startY = (canvas.height / 2) - ((lines.length - 1) * lineHeight / 2);
+            lines.forEach((line, i) => ctx.fillText(line, canvas.width / 2, startY + (i * lineHeight)));
+
+            // Tampilkan
+            currentImageData = canvas.toDataURL('image/png');
+            document.getElementById('resultImage').src = currentImageData;
+            currentApiUrl = `${window.location.origin}/maker/brat?text=${encodeURIComponent(text)}&bgColor=${bgColor}&textColor=${textColor}`;
+            document.getElementById('apiUrl').textContent = currentApiUrl;
+            document.getElementById('resultContainer').classList.remove('hidden');
+
+            // Track
+            let stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0}');
             stats.total++;
             stats.credits++;
-            stats.history.push({ time: new Date().toISOString() });
-            if (stats.history.length > 50) stats.history = stats.history.slice(-50);
             localStorage.setItem('api_stats', JSON.stringify(stats));
         }
 
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof Sidebar !== 'undefined') Sidebar.render('maker');
-            document.getElementById('apiUrlDisplay').textContent = 
-                `${window.location.origin}/maker/brat?text=${encodeURIComponent(textInput.value)}`;
-        });
-    </script>
+        function downloadImage() {
+            if (!currentImageData) return;
+            const a = document.createElement('a');
+            a.download = 'brat.png';
+            a.href = currentImageData;
+            a.click();
+        }
 
-    <script src="/public/js/sidebar.js"></script>
+        function copyApiUrl() {
+            navigator.clipboard.writeText(currentApiUrl).then(() => showToast('✅ Link API dicopy!'));
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            if (type === 'error') t.style.background = '#ef4444';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2000);
+        }
+    </script>
 </body>
 </html>
