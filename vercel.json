@@ -6,7 +6,6 @@
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/uptime", "dest": "/api/uptime.js" },
     { "src": "/public/(.*)", "dest": "/public/$1" },
     { "src": "/api/track", "dest": "/api/track.js" },
     { "src": "/api/stats", "dest": "/api/stats.js" },
@@ -15,6 +14,7 @@
     { "src": "/maker/", "dest": "/maker/index.html" },
     { "src": "/downloader", "dest": "/downloader/index.html" },
     { "src": "/downloader/", "dest": "/downloader/index.html" },
-    { "src": "/", "dest": "/index.html" }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/api/uptime", "dest": "/api/uptime.js" }
   ]
 }
