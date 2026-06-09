@@ -286,7 +286,7 @@
         textOverlay.innerText = text;
         textFit(textOverlay, { maxFontSize: 70 });
         const span = textOverlay.querySelector('span.textFitted');
-        if (span) span.style.filter = 'blur(2px)';
+        if (span) span.style.filter = 'blur(4px)';
         currentApiUrl = `${window.location.origin}/maker/brat?text=${encodeURIComponent(text)}`;
         apiUrlEl.textContent = currentApiUrl;
         trackUsage();
@@ -311,7 +311,7 @@
             // Screenshot langsung dari preview (640px, scale 2x)
             const canvas = await html2canvas(container, {
                 backgroundColor: '#ffffff',
-                scale: 2,
+                scale: 1,
                 useCORS: true,
                 allowTaint: true
             });
