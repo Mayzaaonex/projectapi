@@ -1,10 +1,14 @@
+// ==================== CONFIG ====================
+const API_STATS_URL = '/api-dashboard/api/stats.php';
+const REFRESH_INTERVAL = 1000;
+const MAX_HISTORY = 24;
+
 // ==================== THEME TOGGLE ====================
 function toggleTheme() {
     document.documentElement.classList.toggle('light');
     const isLight = document.documentElement.classList.contains('light');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
     
-    // Update chart theme
     if (trafficChart) {
         const gridColor = isLight ? '#e2e8f0' : '#1e293b';
         const textColor = isLight ? '#94a3b8' : '#64748b';
@@ -16,24 +20,17 @@ function toggleTheme() {
     }
 }
 
-// Load saved theme
 (function() {
     if (localStorage.getItem('theme') === 'light') {
         document.documentElement.classList.add('light');
     }
 })();
 
-// ==================== TRAFFIC CHART (REAL-TIME) ====================
+// ==================== TRAFFIC CHART ====================
 let trafficChart;
-const maxDataPoints = 24;
-const trafficData = [];
-const trafficLabels = [];
-
-// Initialize with empty data
-for (let i = 0; i < maxDataPoints; i++) {
-    trafficData.push(0);
-    trafficLabels.push('');
-}
+let trafficData = Array(MAX_HISTORY).fill(0);
+let trafficLabels = Array(MAX_HISTORY).fill('--:--');
+let prevTotal = 0;
 
 function initChart() {
     const ctx = document.getElementById('trafficChart')?.getContext('2d');
@@ -86,9 +83,6 @@ function initChart() {
                     padding: 10,
                     cornerRadius: 8,
                     displayColors: false,
-                    callbacks: {
-                        label: (ctx) => `${ctx.parsed.y} requests/detik`
-                    }
                 }
             },
             scales: {
@@ -97,10 +91,7 @@ function initChart() {
                     ticks: { 
                         color: isLight ? '#94a3b8' : '#64748b', 
                         font: { size: 9 }, 
-                        maxTicksLimit: 6,
-                        callback: function(val, index) {
-                            return trafficLabels[index] || '';
-                        }
+                        maxTicksLimit: 6 
                     } 
                 },
                 y: { 
@@ -112,65 +103,58 @@ function initChart() {
                         callback: v => v + ' req' 
                     },
                     min: 0,
-                    max: 150,
+                    max: 50,
                     beginAtZero: true
                 }
             }
         }
     });
-    
-    // Start real-time updates
-    startRealTimeSimulation();
 }
 
-// Simulasi real-time dengan pola natural
-function startRealTimeSimulation() {
-    let baseValue = 45;
-    let trend = 1;
-    
-    setInterval(() => {
-        if (!trafficChart) return;
+// ==================== FETCH REAL STATS ====================
+async function fetchStats() {
+    try {
+        const res = await fetch(API_STATS_URL);
+        if (!res.ok) throw new Error('API not ready');
         
+        const data = await res.json();
+        
+        // Update cards
+        const totalEl = document.getElementById('total-requests');
+        const creditsEl = document.getElementById('credits-used');
+        const barEl = document.getElementById('credit-bar');
+        
+        if (totalEl) totalEl.textContent = Number(data.total_requests || 0).toLocaleString();
+        if (creditsEl) creditsEl.textContent = Number(data.credits_used || 0).toLocaleString();
+        if (barEl) barEl.style.width = Math.min(100, (data.credits_used || 0) / 100) + '%';
+        
+        // Update chart
         const now = new Date();
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        const second = now.getSeconds();
-        const timeStr = `${hour}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+        const timeStr = now.getHours() + ':' + 
+                        String(now.getMinutes()).padStart(2, '0') + ':' + 
+                        String(now.getSeconds()).padStart(2, '0');
         
-        // Natural pattern: higher during business hours
-        const hourFactor = Math.sin((hour - 6) * Math.PI / 12) * 25;
+        const currentTotal = data.total_requests || 0;
+        const newRequests = prevTotal > 0 ? 
+            Math.max(0, currentTotal - prevTotal) : 
+            ((data.history && data.history.slice(-1)[0]) ? data.history.slice(-1)[0].count : 0);
         
-        // Random spike sometimes
-        const spike = Math.random() < 0.08 ? Math.random() * 60 : 0;
-        
-        // Random noise
-        const noise = (Math.random() - 0.5) * 20;
-        
-        // Trend shift slowly
-        trend += (Math.random() - 0.5) * 2;
-        trend = Math.max(-15, Math.min(15, trend));
-        
-        // Calculate value
-        let value = baseValue + hourFactor + noise + spike + trend;
-        value = Math.max(8, Math.min(140, value));
-        value = Math.round(value);
-        
-        // Update arrays
-        trafficData.push(value);
+        trafficData.push(newRequests);
         trafficData.shift();
         trafficLabels.push(timeStr);
         trafficLabels.shift();
         
-        // Update chart
-        trafficChart.data.datasets[0].data = [...trafficData];
-        trafficChart.data.labels = [...trafficLabels];
-        trafficChart.update('active');
+        if (trafficChart) {
+            trafficChart.data.datasets[0].data = [...trafficData];
+            trafficChart.data.labels = [...trafficLabels];
+            trafficChart.update('active');
+        }
         
-        // Slowly drift base value
-        baseValue += (Math.random() - 0.5) * 1.5;
-        baseValue = Math.max(30, Math.min(70, baseValue));
+        prevTotal = currentTotal;
         
-    }, 1500); // Update every 1.5 seconds for real-time feel
+    } catch (e) {
+        console.log('Waiting for API data...');
+    }
 }
 
 // ==================== PAGE SWITCH ====================
@@ -183,7 +167,6 @@ function switchPage(page, el) {
     
     if (!target || currentPage === target) return;
     
-    // Fade out current
     if (currentPage) {
         currentPage.style.animation = 'pageOut 0.2s ease forwards';
         setTimeout(() => {
@@ -192,58 +175,44 @@ function switchPage(page, el) {
         }, 200);
     }
     
-    // Fade in target
     setTimeout(() => {
         target.style.display = 'block';
         target.style.animation = 'pageIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards';
         
-        // Init chart if dashboard
         if (page === 'dashboard' && !trafficChart) {
             setTimeout(initChart, 300);
         }
     }, 150);
     
-    // Update active nav
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     if (el) el.classList.add('active');
 }
-
-// ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', () => {
-    // Hide non-dashboard pages
-    document.querySelectorAll('.page').forEach(p => {
-        if (p.id !== 'page-dashboard') p.style.display = 'none';
-    });
-    
-    // Init chart after DOM ready
-    setTimeout(initChart, 500);
-});
 
 // ==================== MODAL LOGIC ====================
 const subApiData = {
     maker: {
         title: 'Maker Endpoints',
         items: [
-            { name: 'Brat Generator', icon: '🟢', desc: 'Buat teks gaya Brat', endpoint: '/api/maker/brat' },
-            { name: 'Text Pro', icon: '📝', desc: 'Text styling premium', endpoint: '/api/maker/textpro' },
-            { name: 'Image Gen', icon: '🖼️', desc: 'Generate gambar AI', endpoint: '/api/maker/image' },
-            { name: 'Sticker', icon: '🌟', desc: 'Buat stiker WA', endpoint: '/api/maker/sticker' }
+            { name: 'Brat Generator', icon: '🟢', desc: 'Buat teks gaya Brat', endpoint: '/maker/brat.php' },
+            { name: 'Text Pro', icon: '📝', desc: 'Text styling premium', endpoint: '/maker/textpro.php' },
+            { name: 'Image Gen', icon: '🖼️', desc: 'Generate gambar AI', endpoint: '/maker/image.php' },
+            { name: 'Sticker Maker', icon: '🌟', desc: 'Buat stiker WA', endpoint: '/maker/sticker.php' }
         ]
     },
     downloader: {
         title: 'Downloader Endpoints',
         items: [
-            { name: 'TikTok', icon: '🎵', desc: 'Download video TikTok', endpoint: '/api/downloader/tiktok' },
-            { name: 'YouTube', icon: '▶️', desc: 'Download video YT', endpoint: '/api/downloader/yt' },
-            { name: 'Instagram', icon: '📷', desc: 'Download post/reel IG', endpoint: '/api/downloader/ig' }
+            { name: 'TikTok', icon: '🎵', desc: 'Download video TikTok', endpoint: '/downloader/tiktok.php' },
+            { name: 'YouTube', icon: '▶️', desc: 'Download video YouTube', endpoint: '/downloader/yt.php' },
+            { name: 'Instagram', icon: '📷', desc: 'Download post/reel IG', endpoint: '/downloader/ig.php' }
         ]
     },
     tools: {
         title: 'Tools Endpoints',
         items: [
-            { name: 'Stalker IG', icon: '👁️', desc: 'Stalk profil Instagram', endpoint: '/api/tools/stalkig' },
-            { name: 'Nulis', icon: '✍️', desc: 'Teks ke gambar nulis', endpoint: '/api/tools/nulis' },
-            { name: 'OCR', icon: '🔍', desc: 'Ekstrak teks gambar', endpoint: '/api/tools/ocr' }
+            { name: 'Stalker IG', icon: '👁️', desc: 'Stalk profil Instagram', endpoint: '/tools/stalkig.php' },
+            { name: 'Nulis', icon: '✍️', desc: 'Teks ke gambar nulis', endpoint: '/tools/nulis.php' },
+            { name: 'OCR', icon: '🔍', desc: 'Ekstrak teks gambar', endpoint: '/tools/ocr.php' }
         ]
     }
 };
@@ -254,14 +223,14 @@ function openSubApi(key) {
     
     document.getElementById('modal-title').textContent = data.title;
     document.getElementById('modal-content').innerHTML = data.items.map(item => `
-        <div class="modal-item">
+        <div class="modal-item" onclick="window.location.href='${item.endpoint}'">
             <div class="flex items-center gap-3">
                 <span class="text-xl">${item.icon}</span>
                 <div class="flex-1">
-                    <p class="text-main text-sm font-semibold">${item.name}</p>
-                    <p class="text-[11px] text-sub">${item.desc}</p>
+                    <p class="text-white text-sm font-semibold">${item.name}</p>
+                    <p class="text-[11px] text-slate-500">${item.desc}</p>
                 </div>
-                <code class="text-[10px] bg-slate-800 light:bg-slate-100 px-2 py-1 rounded text-sub mono">${item.endpoint}</code>
+                <code class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-500 mono">${item.endpoint}</code>
             </div>
         </div>
     `).join('');
@@ -279,26 +248,43 @@ function closeModalDirect() {
     document.getElementById('modal-overlay').classList.remove('show');
 }
 
-// ESC key to close modal
+// ESC to close
 document.addEventListener('keydown', e => { 
     if (e.key === 'Escape') closeModalDirect(); 
 });
 
-// ==================== STATS UPDATE ====================
-setInterval(() => {
-    const upEl = document.getElementById('stat-uptime');
-    const krEl = document.getElementById('stat-kredit');
-    const barEl = document.getElementById('credit-bar');
+// ==================== COPY TO CLIPBOARD ====================
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.createElement('div');
+        toast.textContent = '✅ Link API dicopy!';
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px;
+            background: #22c55e; color: #000; padding: 12px 20px;
+            border-radius: 12px; font-weight: 600; font-size: 13px;
+            z-index: 9999; animation: fadeInUp 0.3s ease;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    });
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    // Hide non-dashboard pages
+    document.querySelectorAll('.page').forEach(p => {
+        if (p.id !== 'page-dashboard') p.style.display = 'none';
+    });
     
-    if (upEl) {
-        const uptime = (99.90 + Math.random() * 0.1).toFixed(2);
-        upEl.innerText = uptime + '%';
-    }
+    // Init chart
+    setTimeout(initChart, 400);
     
-    if (krEl && barEl) {
-        const k = Math.floor(6500 + Math.random() * 500);
-        krEl.innerText = k.toLocaleString();
-        const percent = Math.min(100, (k / 100));
-        barEl.style.width = percent + '%';
-    }
-}, 3000);
+    // Start real-time polling
+    setInterval(fetchStats, REFRESH_INTERVAL);
+    fetchStats();
+});
