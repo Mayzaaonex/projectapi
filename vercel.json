@@ -2,18 +2,17 @@
   "version": 2,
   "builds": [
     { "src": "**/*.html", "use": "@vercel/static" },
-    { "src": "public/**/*", "use": "@vercel/static" },
-    { "src": "api/**/*.js", "use": "@vercel/node" }
+    { "src": "**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/public/(.*)", "dest": "/public/$1" },
     { "src": "/api/track", "dest": "/api/track.js" },
     { "src": "/api/stats", "dest": "/api/stats.js" },
-    { "src": "/maker/brat", "dest": "/maker/brat.html" },
-    { "src": "/maker", "dest": "/maker/index.html" },
-    { "src": "/maker/", "dest": "/maker/index.html" },
-    { "src": "/downloader", "dest": "/downloader/index.html" },
-    { "src": "/downloader/", "dest": "/downloader/index.html" },
+    { "src": "/maker/brat", "dest": "/menu/maker/brat/brat.html" },
+    { "src": "/maker", "dest": "/menu/maker/index.html" },
+    { "src": "/downloader", "dest": "/menu/downloader/index.html" },
+    { "src": "/tools", "dest": "/menu/tools/index.html" },
+    { "src": "/ai", "dest": "/menu/ai/index.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
     { "src": "/", "dest": "/index.html" }
   ]
 }
