@@ -115,42 +115,24 @@ class CursorParticleSystem {
 }
 
 // ========== UPTIME ==========
-let uptimeStart = Date.now();
-let uptimeSynced = false;
-
 async function fetchUptime() {
     try {
         const res = await fetch('/api/uptime');
+        if (!res.ok) return;
         const data = await res.json();
-        if (data.startTime) {
-            uptimeStart = data.startTime;
-            uptimeSynced = true;
-        }
-    } catch (e) {
-        // Kalo error, pake local time aja
-        if (!uptimeSynced) {
-            await fetch('/api/uptime', { method: 'POST' });
-        }
-    }
+        if (data.startTime) uptimeStart = data.startTime;
+    } catch (e) {}
 }
 
 function updateUptime() {
     const uptimeEl = document.getElementById('uptime-display');
     if (!uptimeEl) return;
-    
     const diff = Math.floor((Date.now() - uptimeStart) / 1000);
     const hours = Math.floor(diff / 3600);
     const minutes = Math.floor((diff % 3600) / 60);
     const seconds = diff % 60;
-    
     uptimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
-
-// INIT
-fetchUptime().then(() => {
-    updateUptime();
-    setInterval(updateUptime, 1000);
-});
 
 // ========== CHART ==========
 function initChart() {
@@ -195,7 +177,7 @@ function initChart() {
     });
 }
 
-// ========== FETCH API STATS ==========
+// ========== FETCH STATS ==========
 async function fetchStats() {
     try {
         const res = await fetch(API_STATS_URL);
@@ -240,24 +222,26 @@ async function fetchStats() {
             trendCred.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
         }
 
-    } catch (e) {
-        console.log('Waiting for API...');
-    }
+    } catch (e) {}
 }
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Sidebar !== 'undefined') Sidebar.render('dashboard');
+    // SIDEBAR DULU
+    if (typeof Sidebar !== 'undefined') {
+        Sidebar.render('dashboard');
+    }
 
     new CursorParticleSystem();
     initChart();
-
-    // Fetch uptime dulu, baru start timer
-    fetchUptime().then(() => {
-        updateUptime();
-        setInterval(updateUptime, 1000);
-    });
-
+    
+    // Stats
     fetchStats();
     setInterval(fetchStats, 3000);
+
+    // Uptime (safe - ga nge-block)
+    updateUptime();
+    setInterval(updateUptime, 1000);
+    fetchUptime();
+    setInterval(fetchUptime, 10000);
 });
