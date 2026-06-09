@@ -50,6 +50,7 @@
             font-weight: 500;
             font-family: arial_narrowregular, "Arial Narrow", sans-serif;
             filter: blur(2px);
+            -webkit-filter: blur(2px);
             display: inline-block;
         }
 
@@ -222,7 +223,7 @@
 
                 <div class="mb-8">
                     <h1 style="font-size: 22px; font-weight: 700; color: #fff;">🟢 Brat Generator</h1>
-                    <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Buat teks gaya Brat — preview = hasil download.</p>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Buat teks gaya Brat — download persis preview.</p>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
@@ -303,7 +304,7 @@
         if (text) {
             textInput.value = text;
             updatePreview();
-            setTimeout(() => downloadImage(), 800);
+            setTimeout(() => downloadImage(), 1000);
         }
     }
 
@@ -311,15 +312,14 @@
         const container = document.getElementById('memeContainer');
         
         try {
-            // Screenshot langsung dari preview (640px, scale 2x)
             const canvas = await html2canvas(container, {
                 backgroundColor: '#ffffff',
-                scale: 1,
+                scale: 3,
                 useCORS: true,
                 allowTaint: true,
-                foreignObjectRendering: true
+                logging: false
             });
-
+            
             canvas.toBlob(blob => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -330,7 +330,7 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast('✅ Download selesai!');
-                }, 'image/png');
+            }, 'image/png');
             
             trackUsage();
         } catch (e) {
