@@ -10,7 +10,6 @@
         * { font-family: 'Inter', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
-        /* Background yang lebih "hidup" dengan subtle gradient */
         body { 
             background-color: #050505; 
             background-image: radial-gradient(circle at 80% -20%, rgba(79, 70, 229, 0.1), transparent 50%),
@@ -18,62 +17,153 @@
         }
 
         .sidebar { background: rgba(13, 13, 13, 0.7); backdrop-filter: blur(12px); border-right: 1px solid rgba(255,255,255,0.05); }
-        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13.5px; font-weight: 500; color: #666; transition: all 0.2s ease; cursor: pointer; text-decoration: none; }
+        
+        .nav-link { 
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; 
+            font-size: 13.5px; font-weight: 500; color: #666; transition: all 0.2s ease; 
+            cursor: pointer; text-decoration: none; user-select: none;
+        }
         .nav-link:hover { color: #ccc; background: rgba(255,255,255,0.03); }
         .nav-link.active { color: #fff; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
         
+        /* Dropdown */
+        .dropdown-btn { position: relative; }
+        .dropdown-btn::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            width: 10px; height: 10px;
+            background: url("data:image/svg+xml,%3Csvg width='10' height='10' fill='none' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23666' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center no-repeat;
+            transition: transform 0.2s;
+        }
+        .dropdown-btn.open::after { transform: rotate(180deg); }
+        
+        .submenu {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+            margin-left: 12px;
+            border-left: 1px solid rgba(255,255,255,0.06);
+        }
+        .submenu.open { max-height: 500px; }
+        
+        .sub-link {
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px; 
+            font-size: 12.5px; color: #555; transition: all 0.2s; cursor: pointer; 
+            border-radius: 6px; text-decoration: none;
+        }
+        .sub-link:hover { color: #aaa; background: rgba(255,255,255,0.02); }
+
         .stat-card { 
-            background: rgba(13, 13, 13, 0.5); 
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 16px; 
-            padding: 24px; 
-            transition: all 0.3s ease; 
+            background: rgba(13, 13, 13, 0.5); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; 
+            padding: 24px; transition: all 0.3s ease; text-align: center;
         }
         .stat-card:hover { border-color: rgba(99, 102, 241, 0.2); background: rgba(18, 18, 18, 0.6); }
 
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e44; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        .credit-bar-bg { background: rgba(255,255,255,0.05); border-radius: 99px; height: 6px; overflow: hidden; }
+        .credit-bar-bg { background: rgba(255,255,255,0.05); border-radius: 99px; height: 6px; overflow: hidden; width: 100%; }
         .credit-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #a855f7); transition: width 1s ease-in-out; }
+
+        /* Page container */
+        .page { display: none; }
+        .page.active { display: block; }
     </style>
 </head>
 <body class="text-gray-300">
 
     <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
         <aside class="sidebar w-56 flex flex-col py-6 px-4 shrink-0">
             <div class="px-2 mb-8 flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+                        <path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
                 <span class="text-sm font-semibold text-white tracking-tight">Api-Mayzaa</span>
             </div>
 
+            <!-- NAV -->
             <nav class="flex flex-col gap-1 flex-1">
                 <div class="text-[10px] font-bold text-[#333] uppercase tracking-widest px-3 mb-2">Menu</div>
+                
+                <!-- Dashboard -->
                 <a href="#" class="nav-link active" onclick="setPage('dashboard', this)">
-                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
                     Dashboard
                 </a>
-                <a href="#" class="nav-link" onclick="setPage('api', this)">
-                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                <!-- API Dropdown -->
+                <div class="dropdown-btn nav-link" onclick="toggleDropdown(this)" id="api-dropdown">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                        <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     API
-                </a>
+                </div>
+
+                <!-- Submenu API -->
+                <div class="submenu" id="api-submenu">
+                    <!-- Maker (gepeng dropdown lagi) -->
+                    <div class="dropdown-btn sub-link" onclick="toggleSubDropdown(event, 'maker-sub')" style="position: relative;">
+                        <span>⚙️</span> Maker
+                    </div>
+                    <div class="submenu" id="maker-sub" style="margin-left: 16px; border-left: 1px solid rgba(255,255,255,0.04);">
+                        <a href="#" class="sub-link" onclick="setPage('maker-text', this)">📝 Text Pro</a>
+                        <a href="#" class="sub-link" onclick="setPage('maker-image', this)">🖼️ Image Gen</a>
+                        <a href="#" class="sub-link" onclick="setPage('maker-sticker', this)">🌟 Sticker</a>
+                    </div>
+
+                    <a href="#" class="sub-link" onclick="setPage('downloader', this)">
+                        <span>⬇️</span> Downloader
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('stalker', this)">
+                        <span>👁️</span> Stalker
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('tools', this)">
+                        <span>🔧</span> Tools
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('nsfw', this)">
+                        <span>🔞</span> NSFW
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('ai', this)">
+                        <span>🤖</span> AI Chat
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('islami', this)">
+                        <span>☪️</span> Islami
+                    </a>
+                    <a href="#" class="sub-link" onclick="setPage('other', this)">
+                        <span>📦</span> Other
+                    </a>
+                </div>
             </nav>
+
+            <div class="text-[10px] text-[#333] px-2">Copyright © RianModss</div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-10">
-            <div id="page-dashboard">
-                <div class="mb-8">
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10 flex items-center justify-center">
+            
+            <!-- DASHBOARD PAGE -->
+            <div id="page-dashboard" class="page active w-full max-w-4xl">
+                <div class="mb-8 text-center">
                     <h1 class="text-xl font-bold text-white tracking-tight">Dashboard Overview</h1>
                     <p class="text-sm text-gray-600 mt-1">Status dan penggunaan API saat ini.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
+                <!-- 3 Cards Rata Tengah -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                     <div class="stat-card">
                         <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Status Sistem</p>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center justify-center gap-2">
                             <div class="status-dot"></div>
                             <span class="text-sm font-semibold text-white">Operational</span>
                         </div>
@@ -85,30 +175,103 @@
                     </div>
 
                     <div class="stat-card">
-                        <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Kredit Digunakan Bulan Ini</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-600 font-bold mb-3">Kredit Bulan Ini</p>
                         <span id="stat-kredit" class="text-2xl font-bold text-white mono">6.800</span>
-                        <div class="credit-bar-bg mt-4">
+                        <div class="credit-bar-bg mt-4 mx-auto">
                             <div id="credit-bar" class="credit-bar-fill" style="width: 68%;"></div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- API SUB PAGES (contoh) -->
+            <div id="page-maker-text" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">📝 Maker Text Pro</h1>
+                <p class="text-gray-600 mt-2">Endpoint maker teks akan tampil di sini.</p>
+            </div>
+            <div id="page-maker-image" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">🖼️ Image Generator</h1>
+                <p class="text-gray-600 mt-2">Endpoint image generator.</p>
+            </div>
+            <div id="page-maker-sticker" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">🌟 Sticker Maker</h1>
+                <p class="text-gray-600 mt-2">Endpoint sticker maker.</p>
+            </div>
+            <div id="page-downloader" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">⬇️ Downloader</h1>
+                <p class="text-gray-600 mt-2">Endpoint downloader.</p>
+            </div>
+            <div id="page-stalker" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">👁️ Stalker</h1>
+                <p class="text-gray-600 mt-2">Endpoint stalker.</p>
+            </div>
+            <div id="page-tools" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">🔧 Tools</h1>
+                <p class="text-gray-600 mt-2">Endpoint tools.</p>
+            </div>
+            <div id="page-nsfw" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">🔞 NSFW</h1>
+                <p class="text-gray-600 mt-2">Endpoint NSFW.</p>
+            </div>
+            <div id="page-ai" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">🤖 AI Chat</h1>
+                <p class="text-gray-600 mt-2">Endpoint AI Chat.</p>
+            </div>
+            <div id="page-islami" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">☪️ Islami</h1>
+                <p class="text-gray-600 mt-2">Endpoint Islami.</p>
+            </div>
+            <div id="page-other" class="page w-full max-w-4xl text-center">
+                <h1 class="text-xl font-bold text-white">📦 Other</h1>
+                <p class="text-gray-600 mt-2">Endpoint lainnya.</p>
+            </div>
+
         </main>
     </div>
 
     <script>
+        // Page switching
         function setPage(page, el) {
             event.preventDefault();
+            // Sembunyikan semua page
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Tampilkan page target
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+            // Update nav active
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            el.classList.add('active');
+            if (el && el.classList.contains('nav-link')) el.classList.add('active');
+            // Highlight API dropdown kalo submenu diklik
+            if (page !== 'dashboard') {
+                document.getElementById('api-dropdown').classList.add('active');
+            }
         }
 
+        // Dropdown API
+        function toggleDropdown(el) {
+            el.classList.toggle('open');
+            document.getElementById('api-submenu').classList.toggle('open');
+        }
+
+        // Sub dropdown Maker
+        function toggleSubDropdown(e, id) {
+            e.stopPropagation();
+            const sub = document.getElementById(id);
+            sub.classList.toggle('open');
+            e.target.classList.toggle('open');
+        }
+
+        // Auto update stats
         setInterval(() => {
-            const up = (99.90 + Math.random() * 0.1).toFixed(2);
-            document.getElementById('stat-uptime').innerText = up + '%';
-            const k = Math.floor(6500 + Math.random() * 500);
-            document.getElementById('stat-kredit').innerText = k.toLocaleString();
-            document.getElementById('credit-bar').style.width = (k / 100) + '%';
+            const upEl = document.getElementById('stat-uptime');
+            const krEl = document.getElementById('stat-kredit');
+            const barEl = document.getElementById('credit-bar');
+            if (upEl) upEl.innerText = (99.90 + Math.random() * 0.1).toFixed(2) + '%';
+            if (krEl && barEl) {
+                const k = Math.floor(6500 + Math.random() * 500);
+                krEl.innerText = k.toLocaleString();
+                barEl.style.width = (k / 100) + '%';
+            }
         }, 2000);
     </script>
 </body>
