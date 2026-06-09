@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <style>
+        /* ==================== FONT ==================== */
         @font-face {
             font-family: 'arial_narrowregular';
             src: url('https://www.bratgenerator.com/sites/g/files/g2000017981/files/2024-03/arial_narrow-webfont.woff') format('woff');
@@ -15,9 +16,63 @@
             font-style: normal;
         }
 
+        /* ==================== RESET ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: #020617; font-family: Arial, sans-serif; color: #fff; }
 
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            background: rgba(12, 16, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(99, 102, 241, 0.06);
+            box-shadow: 2px 0 40px rgba(0,0,0,0.3);
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #cbd5e1;
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(3px);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.12));
+            box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.3), 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .sidebar .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #818cf8;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* ==================== BRAT PREVIEW ==================== */
         #memeContainer {
             position: relative;
             display: flex;
@@ -53,6 +108,7 @@
             display: inline-block;
         }
 
+        /* ==================== FORM ELEMENTS ==================== */
         .input-field {
             width: 100%;
             background-color: #020617;
@@ -76,6 +132,7 @@
             display: block;
         }
 
+        /* ==================== BUTTONS ==================== */
         .btn-execute {
             width: 100%;
             background: #6366f1;
@@ -90,6 +147,20 @@
         }
         .btn-execute:hover { background: #4f46e5; }
 
+        .btn-copy {
+            font-size: 12px;
+            background: #6366f1;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-copy:hover { background: #4f46e5; }
+
+        /* ==================== CARDS ==================== */
         .card {
             background: #0f172a;
             border: 1px solid #1e293b;
@@ -108,19 +179,7 @@
             word-break: break-all;
         }
 
-        .btn-copy {
-            font-size: 12px;
-            background: #6366f1;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        .btn-copy:hover { background: #4f46e5; }
-
+        /* ==================== TOAST ==================== */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -132,9 +191,16 @@
             font-size: 13px;
             font-weight: 600;
             z-index: 9999;
+            animation: fadeInUp 0.3s ease;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
         }
 
-        /* Hamburger button */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== HAMBURGER ==================== */
         .hamburger-btn {
             display: none;
             position: fixed;
@@ -153,10 +219,24 @@
             justify-content: center;
         }
 
-        /* Mobile responsive */
+        /* ==================== SCROLLBAR ==================== */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
+
+        /* ==================== MOBILE ==================== */
         @media (max-width: 768px) {
             .hamburger-btn {
                 display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 55;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
             }
 
             main {
@@ -166,11 +246,11 @@
             }
 
             #memeContainer {
-                height: 280px;
+                height: 260px;
             }
 
             #textOverlay {
-                height: 200px;
+                height: 180px;
             }
         }
 
@@ -265,10 +345,11 @@
         const span = textOverlay.querySelector('span.textFitted');
         if (span) span.style.filter = 'blur(2px)';
 
-        currentApiUrl = `${window.location.origin}/maker/brat?text=${encodeURIComponent(text)}`;
+        // API URL untuk auto-download
+        currentApiUrl = `${window.location.origin}/maker/brat-dl?text=${encodeURIComponent(text)}`;
         apiUrlEl.textContent = currentApiUrl;
         
-        // Track usage setiap ngetik (deferred biar ga spam)
+        // Track usage
         trackUsage();
     }
 
@@ -276,18 +357,23 @@
 
     function downloadImage() {
         const text = textInput.value || 'brat';
+        
+        // Canvas persis sama dengan preview
         const canvas = document.createElement('canvas');
         canvas.width = 1080;
         canvas.height = 1080;
         const ctx = canvas.getContext('2d');
 
+        // Background putih persis preview
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, 1080, 1080);
 
+        // Text hitam dengan font Arial Narrow
         ctx.fillStyle = '#000000';
         ctx.font = '500 90px "Arial Narrow", arial_narrowregular, Arial, sans-serif';
         ctx.textBaseline = 'middle';
 
+        // Word wrap sama persis
         const words = text.split(' ');
         const lines = [];
         let currentLine = '';
@@ -308,12 +394,20 @@
         const startY = (1080 / 2) - ((lines.length - 1) * lineHeight / 2);
         lines.forEach((line, i) => ctx.fillText(line, 90, startY + (i * lineHeight)));
 
-        const a = document.createElement('a');
-        a.download = 'brat.png';
-        a.href = canvas.toDataURL('image/png');
-        a.click();
+        // Download
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'brat.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('✅ Download selesai!');
+        }, 'image/png');
         
-        // Track download
+        // Track
         trackUsage();
     }
 
