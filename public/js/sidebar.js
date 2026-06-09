@@ -11,7 +11,7 @@ class Sidebar {
                             <path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
-                    <a href="/" class="text-sm font-bold text-white no-underline" onclick="Sidebar.close()">API-MAYZAA</a>
+                    <a href="/" class="text-sm font-bold text-white no-underline" onclick="Sidebar.close()">DASHBOARD</a>
                 </div>
 
                 <nav class="flex flex-col gap-1 flex-1">

@@ -1,10 +1,12 @@
 const MAX_HISTORY = 24;
+const API_STATS_URL = '/api/stats';
 let trafficChart;
 let trafficData = Array(MAX_HISTORY).fill(0);
 let trafficLabels = Array(MAX_HISTORY).fill('--:--');
 let prevTotal = 0;
+let uptimeStart = new Date();
 
-// ========== LIGHTWEIGHT CURSOR-FOLLOWING PARTICLE SYSTEM ==========
+// ========== PARTICLE SYSTEM ==========
 class CursorParticleSystem {
     constructor() {
         this.canvas = document.getElementById('particle-canvas');
@@ -13,31 +15,23 @@ class CursorParticleSystem {
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
         this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        this.isActive = true;
         this.frameCount = 0;
-
         this.init();
     }
 
     init() {
         this.resize();
         window.addEventListener('resize', () => this.resize());
-
-        // Track mouse position
         window.addEventListener('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
         });
-
-        // Touch support
         window.addEventListener('touchmove', (e) => {
             if (e.touches[0]) {
                 this.mouse.x = e.touches[0].clientX;
                 this.mouse.y = e.touches[0].clientY;
             }
         });
-
-        // Create fewer particles for performance
         this.createParticles(25);
         this.animate();
     }
@@ -52,8 +46,7 @@ class CursorParticleSystem {
             this.particles.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                vx: 0,
-                vy: 0,
+                vx: 0, vy: 0,
                 radius: Math.random() * 1.5 + 0.5,
                 opacity: Math.random() * 0.3 + 0.1,
                 speed: Math.random() * 0.02 + 0.01
@@ -63,24 +56,14 @@ class CursorParticleSystem {
 
     update() {
         for (let p of this.particles) {
-            // Calculate distance to mouse
             const dx = this.mouse.x - p.x;
             const dy = this.mouse.y - p.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            // Follow cursor with easing
             p.vx += dx * p.speed * 0.05;
             p.vy += dy * p.speed * 0.05;
-
-            // Apply friction
             p.vx *= 0.95;
             p.vy *= 0.95;
-
-            // Update position
             p.x += p.vx;
             p.y += p.vy;
-
-            // Wrap around edges
             if (p.x < 0) p.x = this.canvas.width;
             if (p.x > this.canvas.width) p.x = 0;
             if (p.y < 0) p.y = this.canvas.height;
@@ -90,8 +73,6 @@ class CursorParticleSystem {
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Draw connections (only every 3rd frame for performance)
         if (this.frameCount % 3 === 0) {
             const maxDist = 100;
             for (let i = 0; i < this.particles.length; i++) {
@@ -99,7 +80,6 @@ class CursorParticleSystem {
                     const dx = this.particles[i].x - this.particles[j].x;
                     const dy = this.particles[i].y - this.particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-
                     if (dist < maxDist) {
                         const opacity = (1 - dist / maxDist) * 0.06;
                         this.ctx.beginPath();
@@ -112,20 +92,13 @@ class CursorParticleSystem {
                 }
             }
         }
-
-        // Draw particles
         for (let p of this.particles) {
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             this.ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
             this.ctx.fill();
         }
-
-        // Draw mouse glow
-        const gradient = this.ctx.createRadialGradient(
-            this.mouse.x, this.mouse.y, 0,
-            this.mouse.x, this.mouse.y, 80
-        );
+        const gradient = this.ctx.createRadialGradient(this.mouse.x, this.mouse.y, 0, this.mouse.x, this.mouse.y, 80);
         gradient.addColorStop(0, 'rgba(255,255,255,0.03)');
         gradient.addColorStop(1, 'rgba(255,255,255,0)');
         this.ctx.beginPath();
@@ -135,7 +108,6 @@ class CursorParticleSystem {
     }
 
     animate() {
-        if (!this.isActive) return;
         this.frameCount++;
         this.update();
         this.draw();
@@ -143,26 +115,18 @@ class CursorParticleSystem {
     }
 }
 
-// ========== WELCOME SCREEN ==========
-function initWelcomeScreen() {
-    const welcome = document.getElementById('welcome-screen');
-    if (!welcome) return;
-
-    // Cek localStorage (bukan sessionStorage) biar permanen
-    if (localStorage.getItem('welcomeShown')) {
-        welcome.style.display = 'none';
-        return;
-    }
-
-    welcome.style.display = 'flex';
-
-    setTimeout(() => {
-        welcome.classList.add('fade-out');
-        setTimeout(() => {
-            welcome.style.display = 'none';
-            localStorage.setItem('welcomeShown', 'true');
-        }, 1200);
-    }, 2500);
+// ========== UPTIME TIMER ==========
+function updateUptime() {
+    const uptimeEl = document.getElementById('uptime-display');
+    if (!uptimeEl) return;
+    
+    const now = new Date();
+    const diff = Math.floor((now - uptimeStart) / 1000);
+    const hours = Math.floor(diff / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = diff % 60;
+    
+    uptimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 // ========== CHART ==========
@@ -191,7 +155,7 @@ function initChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 500 },
+            animation: { duration: 400 },
             plugins: { legend: { display: false } },
             scales: {
                 x: { 
@@ -201,60 +165,78 @@ function initChart() {
                 y: { 
                     grid: { color: 'rgba(255,255,255,0.03)' }, 
                     ticks: { color: '#555', font: { size: 9 }, maxTicksLimit: 4 }, 
-                    min: 0, 
-                    max: 30 
+                    min: 0, max: 30 
                 }
             }
         }
     });
 }
 
-function updateStats() {
-    if (!trafficChart) return;
+// ========== FETCH API STATS ==========
+async function fetchStats() {
+    try {
+        const res = await fetch(API_STATS_URL);
+        if (!res.ok) return;
 
-    const stats = JSON.parse(localStorage.getItem('api_stats') || '{"total":0,"credits":0,"history":[]}');
-    const now = new Date();
-    const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+        const data = await res.json();
+        const now = new Date();
+        const timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
 
-    const newRequests = Math.max(0, stats.total - prevTotal);
-    prevTotal = stats.total;
+        const newRequests = Math.max(0, (data.total || 0) - prevTotal);
+        prevTotal = data.total || 0;
 
-    trafficData.push(newRequests);
-    trafficData.shift();
-    trafficLabels.push(timeStr);
-    trafficLabels.shift();
+        if (trafficChart) {
+            trafficData.push(newRequests);
+            trafficData.shift();
+            trafficLabels.push(timeStr);
+            trafficLabels.shift();
+            trafficChart.data.datasets[0].data = [...trafficData];
+            trafficChart.data.labels = [...trafficLabels];
+            trafficChart.update('active');
+        }
 
-    trafficChart.data.datasets[0].data = [...trafficData];
-    trafficChart.data.labels = [...trafficLabels];
-    trafficChart.update('active');
+        // Update Total Requests
+        const totalEl = document.getElementById('total-requests');
+        if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString();
 
-    const totalEl = document.getElementById('total-requests');
-    const creditsEl = document.getElementById('credits-used');
-    const creditBar = document.getElementById('credit-bar');
+        // Update Credits
+        const creditsEl = document.getElementById('credits-used');
+        if (creditsEl) creditsEl.textContent = (data.credits || 0).toLocaleString();
 
-    if (totalEl) totalEl.textContent = stats.total.toLocaleString();
-    if (creditsEl) creditsEl.textContent = stats.credits.toLocaleString();
-    if (creditBar) creditBar.style.width = Math.min(100, stats.credits / 100) + '%';
+        // Update Credit Bar + Label
+        const creditBar = document.getElementById('credit-bar');
+        const creditLabel = document.querySelector('.credit-section span.mono');
+        if (creditBar) creditBar.style.width = Math.min(100, (data.credits || 0) / 125) + '%';
+        if (creditLabel) creditLabel.textContent = `${(data.credits || 0).toLocaleString()} / 12,500`;
+
+        // Update trend
+        const trendReq = document.querySelector('.stat-item:nth-child(1) .stat-trend');
+        if (trendReq) {
+            trendReq.textContent = newRequests > 0 ? `↑ ${newRequests}` : '↑ 0';
+            trendReq.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
+        }
+
+        const trendCred = document.querySelector('.stat-item:nth-child(2) .stat-trend');
+        if (trendCred) {
+            trendCred.textContent = newRequests > 0 ? `↑ ${newRequests}` : '↑ 0';
+            trendCred.className = newRequests > 0 ? 'stat-trend up' : 'stat-trend down';
+        }
+
+    } catch (e) {
+        console.log('Waiting for API...');
+    }
 }
 
+// ========== INIT ==========
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing...');
-
     if (typeof Sidebar !== 'undefined') Sidebar.render('dashboard');
 
-    if (!localStorage.getItem('api_stats')) {
-        localStorage.setItem('api_stats', JSON.stringify({ total: 0, credits: 0, history: [] }));
-    }
-
-    // Initialize particle system
     new CursorParticleSystem();
-
-    // Initialize welcome screen - IMPORTANT: must be after particles
-    initWelcomeScreen();
-
     initChart();
-    setInterval(updateStats, 2000);
-    updateStats();
+    fetchStats();
+    updateUptime();
 
-    console.log('Initialization complete');
+    // Refresh tiap 3 detik
+    setInterval(fetchStats, 3000);
+    setInterval(updateUptime, 1000);
 });
